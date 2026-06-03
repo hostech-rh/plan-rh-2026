@@ -711,6 +711,18 @@ tr:hover td{background:var(--white)}
       <div id="vac-rot-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
     </div>
 
+    <!-- BAJAS POR TIPO Y MES -->
+    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:1rem">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75">Bajas por tipo</div>
+        <div style="display:flex;gap:10px">
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#4563ff;font-weight:500"><span style="width:8px;height:8px;border-radius:50%;background:#4563ff;display:inline-block"></span>Voluntaria</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#C40E91;font-weight:500"><span style="width:8px;height:8px;border-radius:50%;background:#C40E91;display:inline-block"></span>Involuntaria</span>
+        </div>
+      </div>
+      <div id="vac-bajas-tipo-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
+    </div>
+
     <!-- VACANTES POR MES -->
     <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
       <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes solicitadas por mes</div>
@@ -1036,6 +1048,7 @@ async function initApp(){
   render();
   renderEjecutivo();
   renderBajas();
+  renderBajasTipoMes();
   renderVacMetrics();
 }
 
@@ -1567,6 +1580,7 @@ function saveBajas(){
   setSavedLabel('Guardado '+t);
   syncToSheets('bajas',bajas);
   renderBajas();
+  renderBajasTipoMes();
   renderVacMetrics();
 }
 
@@ -1716,8 +1730,52 @@ function renderVacMetrics(){
 
   // Cuadritos por mes
   renderRotMes();
+  renderBajasTipoMes();
   renderVacSolMes();
   renderVacCubMes();
+}
+
+function renderBajasTipoMes(){
+  const el=document.getElementById('vac-bajas-tipo-mes');
+  if(!el)return;
+  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const hoy=new Date();
+  const mesActual=hoy.getMonth();
+  const anioActual=hoy.getFullYear();
+
+  el.innerHTML=MESES.map((m,i)=>{
+    const del_mes=bajas.filter(b=>{
+      if(!b.fecha)return false;
+      const d=new Date(b.fecha+'T12:00:00');
+      return d.getMonth()===i&&d.getFullYear()===anioActual;
+    });
+    const vol=del_mes.filter(b=>b.motivo==='voluntaria').length;
+    const inv=del_mes.filter(b=>b.motivo==='involuntaria').length;
+    const total=del_mes.length;
+    const esMes=i===mesActual;
+    const tieneData=total>0;
+    const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
+    const border=esMes?'2px solid #8a7f75':'1px solid #e0d8ce';
+    const bg=tieneData?'#3d3530':'transparent';
+    const labelColor=tieneData?'rgba(255,255,255,0.6)':(esMes?'#8a7f75':'#c4bbb0');
+    return `<div style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${labelColor};margin-bottom:6px">${m.toUpperCase()}</div>
+      ${tieneData?`
+        <div style="display:flex;justify-content:center;gap:6px;margin-bottom:2px">
+          <div style="text-align:center">
+            <div style="font-size:13px;font-weight:700;color:#4563ff;line-height:1">${vol}</div>
+            <div style="font-size:8px;color:rgba(255,255,255,0.4);margin-top:1px">VOL</div>
+          </div>
+          <div style="width:1px;background:rgba(255,255,255,0.15);margin:0 2px"></div>
+          <div style="text-align:center">
+            <div style="font-size:13px;font-weight:700;color:#C40E91;line-height:1">${inv}</div>
+            <div style="font-size:8px;color:rgba(255,255,255,0.4);margin-top:1px">INV</div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:3px">${total} total</div>
+      `:`<div style="font-size:14px;color:${esMes?'#8a7f75':'#c4bbb0'}">–</div>`}
+    </div>`;
+  }).join('');
 }
 
 function renderVacCubMes(){
