@@ -539,16 +539,30 @@ tr:hover td{background:var(--white)}
     <!-- TARJETAS UNIFORMES — vacantes -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">
 
-      <div style="background:#4563ff;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:opacity .15s" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:8px">Vacantes activas</div>
+      <div style="background:#4563ff;border-radius:12px;padding:1rem 1.25rem;cursor:default">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7)">Vacantes solicitadas</div>
+          <div style="display:flex;align-items:center;gap:4px" onclick="event.stopPropagation()">
+            <button onclick="cambiarMesVac(-1)" style="background:rgba(255,255,255,.2);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#fff;display:flex;align-items:center;justify-content:center;padding:0">‹</button>
+            <span id="exec-vac-mes-label" style="font-size:10px;font-weight:700;color:#fff;min-width:26px;text-align:center"></span>
+            <button onclick="cambiarMesVac(1)" style="background:rgba(255,255,255,.2);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#fff;display:flex;align-items:center;justify-content:center;padding:0">›</button>
+          </div>
+        </div>
         <div style="font-family:'DM Serif Display',serif;font-size:40px;line-height:1;color:#fff" id="exec-vac">0</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px">en proceso</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px">en el mes</div>
       </div>
 
-      <div style="background:#d4f5e0;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:opacity .15s" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#1a6b3a;opacity:.7;margin-bottom:8px">Vacantes cubiertas</div>
+      <div style="background:#d4f5e0;border-radius:12px;padding:1rem 1.25rem;cursor:default">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#1a6b3a;opacity:.7">Vacantes cubiertas</div>
+          <div style="display:flex;align-items:center;gap:4px" onclick="event.stopPropagation()">
+            <button onclick="cambiarMesCub(-1)" style="background:rgba(26,107,58,.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#1a6b3a;display:flex;align-items:center;justify-content:center;padding:0">‹</button>
+            <span id="exec-cub-mes-label" style="font-size:10px;font-weight:700;color:#1a6b3a;min-width:26px;text-align:center"></span>
+            <button onclick="cambiarMesCub(1)" style="background:rgba(26,107,58,.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#1a6b3a;display:flex;align-items:center;justify-content:center;padding:0">›</button>
+          </div>
+        </div>
         <div style="font-family:'DM Serif Display',serif;font-size:40px;line-height:1;color:#1a6b3a" id="exec-vac-cubiertas">0</div>
-        <div style="font-size:11px;color:#1a6b3a;opacity:.5;margin-top:6px">acumuladas</div>
+        <div style="font-size:11px;color:#1a6b3a;opacity:.5;margin-top:6px">en el mes</div>
       </div>
 
       <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:opacity .15s" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
@@ -557,8 +571,15 @@ tr:hover td{background:var(--white)}
         <div style="font-size:11px;color:#8a7f75;margin-top:6px">días hábiles</div>
       </div>
 
-      <div style="background:#f9d0ee;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:opacity .15s" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#C40E91;opacity:.8;margin-bottom:8px">Rotación del mes</div>
+      <div style="background:#f9d0ee;border-radius:12px;padding:1rem 1.25rem;cursor:default" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#C40E91;opacity:.8">Rotación</div>
+          <div style="display:flex;align-items:center;gap:4px" onclick="event.stopPropagation()">
+            <button onclick="cambiarMesRot(-1)" style="background:rgba(196,14,145,.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#C40E91;display:flex;align-items:center;justify-content:center;padding:0">‹</button>
+            <span id="exec-rot-mes-label" style="font-size:10px;font-weight:700;color:#C40E91;min-width:26px;text-align:center"></span>
+            <button onclick="cambiarMesRot(1)" style="background:rgba(196,14,145,.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#C40E91;display:flex;align-items:center;justify-content:center;padding:0">›</button>
+          </div>
+        </div>
         <div style="font-family:'DM Serif Display',serif;font-size:40px;line-height:1;color:#C40E91" id="exec-rotacion">–</div>
         <div style="font-size:11px;color:#C40E91;opacity:.6;margin-top:6px">bajas / plantilla</div>
       </div>
@@ -629,11 +650,17 @@ tr:hover td{background:var(--white)}
         <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#10100f" id="vac-rotacion">–</div>
         <div style="font-size:11px;color:rgba(16,16,15,.4)">bajas / plantilla × 100</div>
       </div>
-      <!-- Tiempo promedio reclutar -->
+      <!-- Tiempo promedio vacantes activas -->
       <div style="background:#4563ff;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6)">Tiempo prom. reclutamiento</div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6)">T. prom. activas</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#fff" id="vac-tprom-activas">–</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5)">días háb. sin cubrir</div>
+      </div>
+      <!-- Tiempo promedio vacantes cubiertas (KPI) -->
+      <div style="background:#3d3530;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5)">T. prom. cubiertas</div>
         <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#fff" id="vac-tprom">–</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.5)">días hábiles promedio</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">días háb. · KPI</div>
       </div>
       <!-- Vacantes activas -->
       <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
@@ -658,10 +685,8 @@ tr:hover td{background:var(--white)}
         </div>
         <button onclick="addBaja()" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 14px;border-radius:8px;background:#C40E91;color:#fff;border:none;cursor:pointer;font-weight:500;white-space:nowrap">+ Agregar baja</button>
       </div>
+      <div id="bajas-filtro-label"></div>
       <div style="overflow-x:auto">
-        <table class="vac-table">
-          <thead><tr>
-            <th style="width:115px">Fecha de baja</th>
             <th style="min-width:170px">Persona</th>
             <th style="min-width:170px">Puesto</th>
             <th style="min-width:140px">Departamento</th>
@@ -1286,10 +1311,27 @@ function renderEjecutivo(){
   document.getElementById('exec-init').textContent=s.init;
   document.getElementById('exec-prog').textContent=s.prog;
   // Vacantes activas y cubiertas
-  const vacActivas=(typeof vacs!=='undefined')?vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length:0;
-  const vacCubiertas=(typeof vacs!=='undefined')?vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length:0;
-  document.getElementById('exec-vac').textContent=vacActivas;
-  document.getElementById('exec-vac-cubiertas').textContent=vacCubiertas;
+  const anioActual=new Date().getFullYear();
+
+  // Vacantes solicitadas en el mes seleccionado
+  const vacDelMes=(typeof vacs!=='undefined')?vacs.filter(v=>{
+    if(!v.fechaSolicitud)return false;
+    const d=new Date(v.fechaSolicitud+'T12:00:00');
+    return d.getMonth()===execVacMes && d.getFullYear()===anioActual;
+  }).length:0;
+  document.getElementById('exec-vac').textContent=vacDelMes;
+  const vacLabelEl=document.getElementById('exec-vac-mes-label');
+  if(vacLabelEl) vacLabelEl.textContent=MESES_SHORT_ROT[execVacMes];
+
+  // Vacantes cubiertas en el mes seleccionado
+  const cubDelMes=(typeof vacs!=='undefined')?vacs.filter(v=>{
+    if(!v.fechaIngreso||!['cubierta','cubierta-fuera'].includes(v.status))return false;
+    const d=new Date(v.fechaIngreso+'T12:00:00');
+    return d.getMonth()===execCubMes && d.getFullYear()===anioActual;
+  }).length:0;
+  document.getElementById('exec-vac-cubiertas').textContent=cubDelMes;
+  const cubLabelEl=document.getElementById('exec-cub-mes-label');
+  if(cubLabelEl) cubLabelEl.textContent=MESES_SHORT_ROT[execCubMes];
 
   // Tiempo promedio y rotación
   const cubiertas=(typeof vacs!=='undefined')?vacs.filter(v=>v.fechaSolicitud&&v.fechaIngreso&&['cubierta','cubierta-fuera'].includes(v.status)):[];
@@ -1299,14 +1341,15 @@ function renderEjecutivo(){
 
   const meta=loadVacMeta?loadVacMeta():{plantilla:''};
   const plantilla=parseFloat(meta.plantilla)||0;
-  const hoyE=new Date();
   const numBajasE=(typeof bajas!=='undefined')?bajas.filter(b=>{
     if(!b.fecha)return false;
     const d=new Date(b.fecha+'T12:00:00');
-    return d.getMonth()===hoyE.getMonth()&&d.getFullYear()===hoyE.getFullYear();
+    return d.getMonth()===execRotMes && d.getFullYear()===anioActual;
   }).length:0;
   const rotEl=document.getElementById('exec-rotacion');
   if(rotEl) rotEl.textContent=plantilla>0?(numBajasE/plantilla*100).toFixed(1)+'%':'–';
+  const labelEl=document.getElementById('exec-rot-mes-label');
+  if(labelEl) labelEl.textContent=MESES_SHORT_ROT[execRotMes];
 
   // Heatmap
   const MES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -1414,7 +1457,17 @@ function renderEjecutivo(){
   document.getElementById('exec-vacantes').innerHTML=vacHtml;
 }
 
-// ── VACANTES ──
+// Filtros activos de mes en pestaña vacantes
+let filtroBajasMes=null;   // null = todos, 0-11 = mes específico
+let filtroVacSolMes=null;
+let filtroVacCubMes=null;
+let execRotMes=new Date().getMonth();
+let execVacMes=new Date().getMonth();
+let execCubMes=new Date().getMonth();
+const MESES_SHORT_ROT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+function cambiarMesRot(dir){ execRotMes=(execRotMes+dir+12)%12; renderEjecutivo(); }
+function cambiarMesVac(dir){ execVacMes=(execVacMes+dir+12)%12; renderEjecutivo(); }
+function cambiarMesCub(dir){ execCubMes=(execCubMes+dir+12)%12; renderEjecutivo(); }
 const VAC_KEY='hostech_vac_v1';
 const STATUS_VAC=[
   {val:'en-tiempo',   label:'En tiempo',           cls:'vs-tiempo'},
@@ -1486,13 +1539,32 @@ function renderBajas(){
   const tbody=document.getElementById('bajas-body');
   const empty=document.getElementById('bajas-empty');
   if(!tbody)return;
-  if(!bajas.length){
+  const MESES_LABEL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const anioActual=new Date().getFullYear();
+  const lista=filtroBajasMes!==null?bajas.filter(b=>{
+    if(!b.fecha)return false;
+    const d=new Date(b.fecha+'T12:00:00');
+    return d.getMonth()===filtroBajasMes&&d.getFullYear()===anioActual;
+  }):bajas;
+
+  // Indicador de filtro activo
+  let filtroHtml='';
+  if(filtroBajasMes!==null){
+    filtroHtml=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 12px;background:#fce8f7;border-radius:8px;font-size:12px;color:#C40E91;font-weight:500">
+      <span>Filtrando: ${MESES_LABEL[filtroBajasMes]} · ${lista.length} baja${lista.length!==1?'s':''}</span>
+      <button onclick="toggleFiltroBajas(${filtroBajasMes})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#C40E91;font-size:14px;line-height:1">× ver todas</button>
+    </div>`;
+  }
+  const filtroEl=document.getElementById('bajas-filtro-label');
+  if(filtroEl) filtroEl.innerHTML=filtroHtml;
+
+  if(!lista.length){
     tbody.innerHTML='';
-    if(empty) empty.style.display='block';
+    if(empty){empty.style.display='block';empty.textContent=filtroBajasMes!==null?`Sin bajas en ${MESES_LABEL[filtroBajasMes]}`:'Sin bajas registradas · clic en "+ Agregar baja" para empezar';}
     return;
   }
   if(empty) empty.style.display='none';
-  tbody.innerHTML=bajas.map(b=>`<tr>
+  tbody.innerHTML=lista.map(b=>`<tr>
     <td><input class="vac-input" type="date" value="${b.fecha||''}" onchange="updBaja('${b.id}','fecha',this.value)" style="min-width:120px"></td>
     <td style="min-width:170px"><input id="bp-${b.id}" class="vac-input" type="text" value="${(b.persona||'').replace(/"/g,'&quot;')}" placeholder="Nombre completo" onchange="updBaja('${b.id}','persona',this.value)" onblur="renderBajas()" style="width:100%"></td>
     <td style="min-width:170px"><input class="vac-input" type="text" value="${(b.puesto||'').replace(/"/g,'&quot;')}" placeholder="Puesto" onchange="updBaja('${b.id}','puesto',this.value)" onblur="renderBajas()" style="width:100%"></td>
@@ -1541,7 +1613,13 @@ function renderVacMetrics(){
   const rotEl=document.getElementById('vac-rotacion');
   if(rotEl) rotEl.textContent=plantilla>0?(numBajas/plantilla*100).toFixed(1)+'%':'–';
 
-  // Tiempo promedio reclutamiento
+  // Tiempo promedio vacantes ACTIVAS (días sin cubrir hasta hoy)
+  const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&!['cubierta','cubierta-fuera'].includes(v.status));
+  const tpromActivas=actvasConFecha.length?Math.round(actvasConFecha.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,new Date().toISOString().slice(0,10)),0)/actvasConFecha.length):null;
+  const tpaEl=document.getElementById('vac-tprom-activas');
+  if(tpaEl) tpaEl.textContent=tpromActivas?tpromActivas+' días':'–';
+
+  // Tiempo promedio vacantes CUBIERTAS (sol → ingreso, KPI)
   const cubiertas=vacs.filter(v=>v.fechaSolicitud&&v.fechaIngreso&&['cubierta','cubierta-fuera'].includes(v.status));
   const tprom=cubiertas.length?Math.round(cubiertas.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,v.fechaIngreso),0)/cubiertas.length):null;
   const tpEl=document.getElementById('vac-tprom');
@@ -1575,15 +1653,17 @@ function renderVacCubMes(){
       const d=new Date(v.fechaIngreso+'T12:00:00');
       return d.getMonth()===i && d.getFullYear()===anioActual;
     }).length;
-    const esMes=i===mesActual;
+    const esFiltro=filtroVacCubMes===i;
     const tieneData=n>0;
+    const esMes=i===mesActual;
     const color='#1a6b3a';
-    const bg=tieneData?(esMes?color:'#3d3530'):'transparent';
-    const txtColor=tieneData?'#fff':(esMes?color:'#8a7f75');
-    const border=esMes?`2px solid ${color}`:'1px solid #e0d8ce';
+    const bg=esFiltro?color:(tieneData?(esMes?color:'#3d3530'):'transparent');
+    const txtColor=(tieneData||esFiltro)?'#fff':(esMes?color:'#8a7f75');
+    const border=esFiltro||esMes?`2px solid ${color}`:'1px solid #e0d8ce';
     const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
-    return `<div style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${tieneData?'rgba(255,255,255,0.7)':(esMes?color:'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
+    const cursor=tieneData||esFiltro?'pointer':'default';
+    return `<div onclick="toggleFiltroVacCub(${i})" style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s;cursor:${cursor}">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${(tieneData||esFiltro)?'rgba(255,255,255,0.7)':(esMes?color:'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
       <div style="font-size:15px;font-weight:700;color:${txtColor};line-height:1">${tieneData?n:'–'}</div>
       ${tieneData?`<div style="font-size:9px;color:rgba(255,255,255,0.6);margin-top:2px">cubierta${n!==1?'s':''}</div>`:''}
     </div>`;
@@ -1607,14 +1687,17 @@ function renderVacSolMes(){
     const n=vacsMes.length;
     const esMes=i===mesActual;
     const tieneData=n>0;
-    const bg=tieneData?(esMes?'#4563ff':'#3d3530'):'transparent';
-    const txtColor=tieneData?'#fff':(esMes?'#4563ff':'#8a7f75');
-    const border=esMes?'2px solid #4563ff':'1px solid #e0d8ce';
+    const esFiltro=filtroVacSolMes===i;
+    const color='#4563ff';
+    const bg=esFiltro?color:(tieneData?(esMes?color:'#3d3530'):'transparent');
+    const txtColor=(tieneData||esFiltro)?'#fff':(esMes?color:'#8a7f75');
+    const border=esFiltro||esMes?`2px solid ${color}`:'1px solid #e0d8ce';
     const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
-    return `<div style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${tieneData?'rgba(255,255,255,0.7)':(esMes?'#4563ff':'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
+    const cursor=tieneData||esFiltro?'pointer':'default';
+    return `<div onclick="toggleFiltroVacSol(${i})" style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s;cursor:${cursor}">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${(tieneData||esFiltro)?'rgba(255,255,255,0.7)':(esMes?color:'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
       <div style="font-size:15px;font-weight:700;color:${txtColor};line-height:1">${tieneData?n:'–'}</div>
-      ${tieneData?`<div style="font-size:9px;color:${tieneData?'rgba(255,255,255,0.6)':'#c8c7be'};margin-top:2px">vacante${n!==1?'s':''}</div>`:''}
+      ${tieneData?`<div style="font-size:9px;color:rgba(255,255,255,0.6);margin-top:2px">vacante${n!==1?'s':''}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -1639,54 +1722,37 @@ function renderRotMes(){
     const pct=plantilla>0?(n/plantilla*100).toFixed(1):null;
     const esMes=i===mesActual;
     const tieneData=n>0;
-    const bg=tieneData?(esMes?'#C40E91':'#3d3530'):'transparent';
-    const txtColor=tieneData?'#fff':(esMes?'#C40E91':'#8a7f75');
-    const border=esMes?'2px solid #C40E91':'1px solid #e0d8ce';
+    const esFiltro=filtroBajasMes===i;
+    const cursor=tieneData||esFiltro?'pointer':'default';
     const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
-    return `<div style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${tieneData?'rgba(255,255,255,0.7)':(esMes?'#C40E91':'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
-      <div style="font-size:15px;font-weight:700;color:${txtColor};line-height:1">${pct!==null?pct+'%':'–'}</div>
-      ${tieneData?`<div style="font-size:9px;color:${tieneData?'rgba(255,255,255,0.6)':'#c8c7be'};margin-top:2px">${n} baja${n!==1?'s':''}</div>`:''}
+    const borderFinal=esFiltro?'2px solid #C40E91':(esMes?'2px solid #C40E91':'1px solid #e0d8ce');
+    const bgFinal=esFiltro?'#C40E91':(tieneData?(esMes?'#C40E91':'#3d3530'):'transparent');
+    const txtFinal=esFiltro?'#fff':(tieneData?'#fff':(esMes?'#C40E91':'#8a7f75'));
+    return `<div onclick="toggleFiltroBajas(${i})" style="border:${borderFinal};border-radius:10px;padding:10px 6px;text-align:center;background:${bgFinal};opacity:${opacity};transition:all .2s;cursor:${cursor}">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${(tieneData||esFiltro)?'rgba(255,255,255,0.7)':(esMes?'#C40E91':'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
+      <div style="font-size:15px;font-weight:700;color:${txtFinal};line-height:1">${pct!==null?pct+'%':'–'}</div>
+      ${tieneData?`<div style="font-size:9px;color:rgba(255,255,255,0.6);margin-top:2px">${n} baja${n!==1?'s':''}</div>`:''}
     </div>`;
   }).join('');
 }
 
-function renderVacChart(){
-  const MESES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  // Solicitadas por mes (por fechaSolicitud)
-  const solPorMes={};
-  vacs.forEach(v=>{
-    if(!v.fechaSolicitud)return;
-    const m=new Date(v.fechaSolicitud+'T12:00:00').getMonth();
-    solPorMes[m]=(solPorMes[m]||0)+1;
-  });
-  // Cubiertas por mes (por fechaIngreso)
-  const cubPorMes={};
-  vacs.filter(v=>v.fechaIngreso&&['cubierta','cubierta-fuera'].includes(v.status)).forEach(v=>{
-    const m=new Date(v.fechaIngreso+'T12:00:00').getMonth();
-    cubPorMes[m]=(cubPorMes[m]||0)+1;
-  });
-
-  function renderBar(containerId, labelId, data, color){
-    const el=document.getElementById(containerId);
-    const lel=document.getElementById(labelId);
-    if(!el||!lel)return;
-    const meses=Object.keys(data).map(Number).sort((a,b)=>a-b);
-    if(!meses.length){el.innerHTML='<div style="font-size:12px;color:#c8c7be;padding:8px">Sin datos aún</div>';lel.innerHTML='';return;}
-    const max=Math.max(...Object.values(data));
-    el.innerHTML=meses.map(m=>{
-      const v=data[m]||0;
-      const h=max?Math.round(v/max*72):0;
-      return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
-        <div style="font-size:11px;font-weight:600;color:#3d3530">${v}</div>
-        <div style="width:100%;max-width:36px;height:${h}px;min-height:4px;background:${color};border-radius:4px 4px 0 0"></div>
-      </div>`;
-    }).join('');
-    lel.innerHTML=meses.map(m=>`<div style="flex:1;text-align:center;font-size:10px;color:#8a7f75">${MESES_SHORT[m]}</div>`).join('');
-  }
-
-  renderBar('vac-chart-sol','vac-chart-sol-labels',solPorMes,'#4563ff');
-  renderBar('vac-chart-cub','vac-chart-cub-labels',cubPorMes,'#1a6b3a');
+function toggleFiltroBajas(mes){
+  filtroBajasMes=filtroBajasMes===mes?null:mes;
+  // Abrir panel si está cerrado
+  const panel=document.getElementById('bajas-panel');
+  if(panel&&filtroBajasMes!==null&&panel.style.display==='none') toggleBajas();
+  renderBajas();
+  renderRotMes();
+}
+function toggleFiltroVacSol(mes){
+  filtroVacSolMes=filtroVacSolMes===mes?null:mes;
+  renderVacantes();
+  renderVacSolMes();
+}
+function toggleFiltroVacCub(mes){
+  filtroVacCubMes=filtroVacCubMes===mes?null:mes;
+  renderVacantes();
+  renderVacCubMes();
 }
 
 function loadVac(){try{const r=localStorage.getItem(VAC_KEY);return r?JSON.parse(r):[];}catch{return[];}}
@@ -1793,6 +1859,44 @@ function delVacante(id){
 }
 
 function renderVacantes(){
+  const MESES_LABEL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const anioActual=new Date().getFullYear();
+
+  // Aplicar filtro de mes si está activo
+  let listaVacs=vacs;
+  let filtroActivoLabel='';
+  if(filtroVacSolMes!==null){
+    listaVacs=vacs.filter(v=>{
+      if(!v.fechaSolicitud)return false;
+      const d=new Date(v.fechaSolicitud+'T12:00:00');
+      return d.getMonth()===filtroVacSolMes&&d.getFullYear()===anioActual;
+    });
+    filtroActivoLabel=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 12px;background:#eef0ff;border-radius:8px;font-size:12px;color:#4563ff;font-weight:500">
+      <span>Solicitadas en ${MESES_LABEL[filtroVacSolMes]} · ${listaVacs.length} vacante${listaVacs.length!==1?'s':''}</span>
+      <button onclick="toggleFiltroVacSol(${filtroVacSolMes})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#4563ff;font-size:14px;line-height:1">× ver todas</button>
+    </div>`;
+  } else if(filtroVacCubMes!==null){
+    listaVacs=vacs.filter(v=>{
+      if(!v.fechaIngreso||!['cubierta','cubierta-fuera'].includes(v.status))return false;
+      const d=new Date(v.fechaIngreso+'T12:00:00');
+      return d.getMonth()===filtroVacCubMes&&d.getFullYear()===anioActual;
+    });
+    filtroActivoLabel=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 12px;background:#e8f5ee;border-radius:8px;font-size:12px;color:#1a6b3a;font-weight:500">
+      <span>Cubiertas en ${MESES_LABEL[filtroVacCubMes]} · ${listaVacs.length} vacante${listaVacs.length!==1?'s':''}</span>
+      <button onclick="toggleFiltroVacCub(${filtroVacCubMes})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#1a6b3a;font-size:14px;line-height:1">× ver todas</button>
+    </div>`;
+  }
+
+  // Insertar label de filtro sobre la tabla
+  let filtroEl=document.getElementById('vac-tabla-filtro');
+  if(!filtroEl){
+    filtroEl=document.createElement('div');
+    filtroEl.id='vac-tabla-filtro';
+    const tableWrap=document.querySelector('#tab-vacantes .vac-table')?.closest('div[style*="overflow-x"]');
+    if(tableWrap) tableWrap.parentNode.insertBefore(filtroEl,tableWrap);
+  }
+  filtroEl.innerHTML=filtroActivoLabel;
+
   // Summary
   const total=vacs.length;
   const activas=vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length;
@@ -1810,10 +1914,10 @@ function renderVacantes(){
   // Rows
   const statusOpts=STATUS_VAC.map(s=>`<option value="${s.val}">${s.label}</option>`).join('');
   let html='';
-  if(!vacs.length){
-    html='<tr><td colspan="10" style="padding:2rem;text-align:center;color:var(--ink-muted)">No hay vacantes registradas · haz clic en "+ Nueva vacante" para empezar</td></tr>';
+  if(!listaVacs.length){
+    html=`<tr><td colspan="10" style="padding:2rem;text-align:center;color:var(--ink-muted)">${filtroVacSolMes!==null||filtroVacCubMes!==null?'Sin vacantes en ese mes':'No hay vacantes registradas · haz clic en "+ Nueva vacante" para empezar'}</td></tr>`;
   }
-  vacs.forEach(v=>{
+  listaVacs.forEach(v=>{
     const sv=STATUS_VAC.find(s=>s.val===v.status)||STATUS_VAC[0];
     const dias=diasActivosStr(v);
     const dc=typeof dias==='number'?diasColor(dias,v.meta):'transparent';
