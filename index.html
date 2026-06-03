@@ -1015,7 +1015,7 @@ async function initApp(){
       if(remote.hellena) { hbl=remote.hellena;    localStorage.setItem(HBL_KEY,JSON.stringify(hbl)); }
       if(remote.sueldos) { sh=remote.sueldos;     localStorage.setItem(SH_KEY,JSON.stringify(sh)); }
       if(remote.comite)  { comiteItems=remote.comite; localStorage.setItem(COM_KEY,JSON.stringify(comiteItems)); }
-      if(remote.bajas)   { bajas=remote.bajas;     localStorage.setItem(BAJAS_KEY,JSON.stringify(bajas)); renderBajas(); renderVacMetrics(); }
+      if(remote.bajas)   { bajas=remote.bajas; localStorage.setItem(BAJAS_KEY,JSON.stringify(bajas)); setTimeout(()=>{ renderBajas(); renderVacMetrics(); },100); }
       if(remote.plantilla_snaps){ localStorage.setItem(PLANTILLA_SNAP_KEY,JSON.stringify(remote.plantilla_snaps)); }
       if(!remote.tareas)   syncToSheets('tareas',tasks);
       if(!remote.vacantes) syncToSheets('vacantes',vacs);
@@ -1578,15 +1578,15 @@ function toggleBajas(e){
     panel.style.display='none';
     chevron.textContent='▾ ver detalle';
     card.style.borderColor='#e0d8ce';
-    // Limpiar filtro al cerrar
     filtroBajasMes=null;
     renderRotMes();
   } else {
     panel.style.display='block';
     chevron.textContent='▴ cerrar';
     card.style.borderColor='#C40E91';
-    filtroBajasMes=null; // Mostrar todas al abrir con el botón de la tarjeta
-    renderBajas();
+    filtroBajasMes=null;
+    // Pequeño delay para asegurar que el DOM esté visible antes de renderizar
+    setTimeout(()=>renderBajas(), 30);
   }
 }
 
@@ -1818,7 +1818,6 @@ function renderRotMes(){
 
 function toggleFiltroBajas(mes){
   filtroBajasMes=filtroBajasMes===mes?null:mes;
-  // Abrir panel si está cerrado — sin resetear el filtro
   const panel=document.getElementById('bajas-panel');
   const chevron=document.getElementById('vac-bajas-chevron');
   const card=document.getElementById('vac-bajas-card');
@@ -1827,8 +1826,7 @@ function toggleFiltroBajas(mes){
     if(chevron) chevron.textContent='▴ cerrar';
     if(card) card.style.borderColor='#C40E91';
   }
-  renderBajas();
-  renderRotMes();
+  setTimeout(()=>{ renderBajas(); renderRotMes(); }, 30);
 }
 function toggleFiltroVacSol(mes){
   filtroVacSolMes=filtroVacSolMes===mes?null:mes;
