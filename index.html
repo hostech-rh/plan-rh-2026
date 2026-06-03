@@ -1183,10 +1183,35 @@ function upd(id,field,val){
   const t=tasks.find(x=>x.id===id);
   if(t){
     t[field]=val;
+    // Si acaba de seleccionar el mes destino de reprogramación → copiar la tarea
+    if(field==='nuevoMes' && val && t.status==='Reprogramada'){
+      // Verificar que no exista ya una copia para ese mes
+      const yaExiste=tasks.some(x=>x.reprogramadaDe===id&&x.mes===val);
+      if(!yaExiste){
+        const copia={
+          id: Date.now(),
+          mes: val,
+          eje: t.eje,
+          accion: t.accion,
+          resp: t.resp,
+          status: 'Sin iniciar',
+          notas: (t.notas?t.notas+' · ':'')+'Reprogramada desde '+t.mes,
+          entregable: t.entregable||'',
+          nuevoMes: '',
+          reprogramadaDe: id
+        };
+        tasks.push(copia);
+        setTimeout(()=>{
+          const rows=document.querySelectorAll('#tbody tr');
+          rows[rows.length-1]?.scrollIntoView({behavior:'smooth',block:'center'});
+        },120);
+      }
+    }
     dsave();
     renderMeta();
     const active=document.activeElement;
     const isTyping=active&&(active.tagName==='TEXTAREA'||active.tagName==='INPUT')&&active.type!=='date'&&active.type!=='number';
+    if(!isTyping) render();
     if(!isTyping&&document.getElementById('tab-dashboard').style.display!=='none') renderDash();
   }
 }
@@ -1506,9 +1531,20 @@ function toggleBajas(e){
   const chevron=document.getElementById('vac-bajas-chevron');
   const card=document.getElementById('vac-bajas-card');
   const open=panel.style.display!=='none';
-  panel.style.display=open?'none':'block';
-  chevron.textContent=open?'▾ ver detalle':'▴ cerrar';
-  card.style.borderColor=open?'#e0d8ce':'#C40E91';
+  if(open){
+    panel.style.display='none';
+    chevron.textContent='▾ ver detalle';
+    card.style.borderColor='#e0d8ce';
+    // Limpiar filtro al cerrar
+    filtroBajasMes=null;
+    renderRotMes();
+  } else {
+    panel.style.display='block';
+    chevron.textContent='▴ cerrar';
+    card.style.borderColor='#C40E91';
+    filtroBajasMes=null; // Mostrar todas al abrir con el botón de la tarjeta
+    renderBajas();
+  }
 }
 
 function addBaja(){
