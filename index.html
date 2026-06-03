@@ -1013,6 +1013,7 @@ async function initApp(){
       if(remote.sueldos) { sh=remote.sueldos;     localStorage.setItem(SH_KEY,JSON.stringify(sh)); }
       if(remote.comite)  { comiteItems=remote.comite; localStorage.setItem(COM_KEY,JSON.stringify(comiteItems)); }
       if(remote.bajas)   { bajas=remote.bajas;     localStorage.setItem(BAJAS_KEY,JSON.stringify(bajas)); renderBajas(); renderVacMetrics(); }
+      if(remote.plantilla_snaps){ localStorage.setItem(PLANTILLA_SNAP_KEY,JSON.stringify(remote.plantilla_snaps)); }
       if(!remote.tareas)   syncToSheets('tareas',tasks);
       if(!remote.vacantes) syncToSheets('vacantes',vacs);
       if(!remote.kpis)     syncToSheets('kpis',kpis);
@@ -1020,6 +1021,7 @@ async function initApp(){
       if(!remote.sueldos)  syncToSheets('sueldos',sh);
       if(!remote.comite)   syncToSheets('comite',comiteItems);
       if(!remote.bajas)    syncToSheets('bajas',bajas);
+      if(!remote.plantilla_snaps) syncToSheets('plantilla_snaps',loadPlantillaSnaps());
       setSavedLabel('Datos sincronizados ✓');
     } else {
       setSavedLabel('Modo local · sin conexión');
@@ -1368,8 +1370,7 @@ function renderEjecutivo(){
   const tpEl=document.getElementById('exec-tprom');
   if(tpEl) tpEl.textContent=tprom?tprom+' días':'–';
 
-  const meta=loadVacMeta?loadVacMeta():{plantilla:''};
-  const plantilla=parseFloat(meta.plantilla)||0;
+  const plantilla=getPlantillaParaMes(execRotMes, anioActual);
   const numBajasE=(typeof bajas!=='undefined')?bajas.filter(b=>{
     if(!b.fecha)return false;
     const d=new Date(b.fecha+'T12:00:00');
@@ -1507,12 +1508,47 @@ const STATUS_VAC=[
   {val:'cubierta-fuera',label:'Cubierta f/tiempo',  cls:'vs-cubierta-fuera'},
   {val:'por-ingresar',label:'Por ingresar',         cls:'vs-por-ingresar'},
 ];
-// ── VACANTES META (plantilla) ──
+// ── VACANTES META (plantilla + snapshots históricos) ──
 const VAC_META_KEY='hostech_vac_meta_v1';
+const PLANTILLA_SNAP_KEY='hostech_plantilla_snaps_v1';
+
 function loadVacMeta(){try{return JSON.parse(localStorage.getItem(VAC_META_KEY))||{plantilla:''};}catch{return{plantilla:''};}}
+
+function loadPlantillaSnaps(){try{return JSON.parse(localStorage.getItem(PLANTILLA_SNAP_KEY))||[];}catch{return[];}}
+
+// Devuelve la plantilla vigente para un mes/año dado (usa el snapshot más reciente ≤ ese mes)
+function getPlantillaParaMes(mes, anio){
+  const snaps=loadPlantillaSnaps();
+  if(!snaps.length) return parseFloat(loadVacMeta().plantilla)||0;
+  // Filtrar snapshots anteriores o iguales al mes pedido
+  const anteriores=snaps.filter(s=>s.anio<anio||(s.anio===anio&&s.mes<=mes));
+  if(!anteriores.length){
+    // Usar el más antiguo disponible
+    const sorted=[...snaps].sort((a,b)=>a.anio-b.anio||a.mes-b.mes);
+    return sorted[0].plantilla;
+  }
+  // Usar el más reciente de los anteriores
+  const sorted=anteriores.sort((a,b)=>b.anio-a.anio||b.mes-a.mes);
+  return sorted[0].plantilla;
+}
+
 function saveVacMeta(){
-  const meta={plantilla:document.getElementById('vac-plantilla').value};
+  const val=document.getElementById('vac-plantilla').value;
+  const meta={plantilla:val};
   localStorage.setItem(VAC_META_KEY,JSON.stringify(meta));
+  // Guardar snapshot del mes actual
+  if(val){
+    const hoy=new Date();
+    const snaps=loadPlantillaSnaps();
+    const mesActual=hoy.getMonth();
+    const anioActual=hoy.getFullYear();
+    // Reemplazar si ya existe snap de este mes, si no agregar
+    const idx=snaps.findIndex(s=>s.mes===mesActual&&s.anio===anioActual);
+    const snap={mes:mesActual,anio:anioActual,plantilla:parseFloat(val)};
+    if(idx>=0) snaps[idx]=snap; else snaps.push(snap);
+    localStorage.setItem(PLANTILLA_SNAP_KEY,JSON.stringify(snaps));
+    syncToSheets('plantilla_snaps',snaps);
+  }
   renderVacMetrics();
 }
 
@@ -1648,10 +1684,10 @@ function renderVacMetrics(){
   const bajasSubEl=document.getElementById('vac-bajas-sub');
   if(bajasSubEl) bajasSubEl.textContent=MESES_SHORT[mesActual]+' · dato manual · Supercompany';
 
-  // Rotación calculada solo con bajas del mes actual
-  const plantilla=parseFloat(meta.plantilla)||0;
+  // Rotación calculada con plantilla del mes actual (snapshot)
+  const plantillaMesActual=getPlantillaParaMes(mesActual, anioActual);
   const rotEl=document.getElementById('vac-rotacion');
-  if(rotEl) rotEl.textContent=plantilla>0?(numBajas/plantilla*100).toFixed(1)+'%':'–';
+  if(rotEl) rotEl.textContent=plantillaMesActual>0?(numBajas/plantillaMesActual*100).toFixed(1)+'%':'–';
 
   // Tiempo promedio vacantes ACTIVAS (días sin cubrir hasta hoy)
   const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&!['cubierta','cubierta-fuera'].includes(v.status));
@@ -1759,7 +1795,8 @@ function renderRotMes(){
       return d.getMonth()===i && d.getFullYear()===anioActual;
     });
     const n=bajasDelMes.length;
-    const pct=plantilla>0?(n/plantilla*100).toFixed(1):null;
+    const plantillaMes=getPlantillaParaMes(i, anioActual);
+    const pct=plantillaMes>0?(n/plantillaMes*100).toFixed(1):null;
     const esMes=i===mesActual;
     const tieneData=n>0;
     const esFiltro=filtroBajasMes===i;
@@ -1778,9 +1815,15 @@ function renderRotMes(){
 
 function toggleFiltroBajas(mes){
   filtroBajasMes=filtroBajasMes===mes?null:mes;
-  // Abrir panel si está cerrado
+  // Abrir panel si está cerrado — sin resetear el filtro
   const panel=document.getElementById('bajas-panel');
-  if(panel&&filtroBajasMes!==null&&panel.style.display==='none') toggleBajas();
+  const chevron=document.getElementById('vac-bajas-chevron');
+  const card=document.getElementById('vac-bajas-card');
+  if(panel&&panel.style.display==='none'){
+    panel.style.display='block';
+    if(chevron) chevron.textContent='▴ cerrar';
+    if(card) card.style.borderColor='#C40E91';
+  }
   renderBajas();
   renderRotMes();
 }
