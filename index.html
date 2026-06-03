@@ -1029,6 +1029,7 @@ async function initApp(){
       if(remote.comite)  { comiteItems=remote.comite; localStorage.setItem(COM_KEY,JSON.stringify(comiteItems)); }
       if(remote.bajas)   { bajas=remote.bajas; localStorage.setItem(BAJAS_KEY,JSON.stringify(bajas)); setTimeout(()=>{ renderBajas(); renderVacMetrics(); },100); }
       if(remote.plantilla_snaps){ localStorage.setItem(PLANTILLA_SNAP_KEY,JSON.stringify(remote.plantilla_snaps)); }
+      if(remote.kpi_hist){ localStorage.setItem(KPI_HIST_KEY,JSON.stringify(remote.kpi_hist)); }
       if(!remote.tareas)   syncToSheets('tareas',tasks);
       if(!remote.vacantes) syncToSheets('vacantes',vacs);
       if(!remote.kpis)     syncToSheets('kpis',kpis);
@@ -2088,22 +2089,20 @@ function renderVacantes(){
 
 const KPI_KEY='hostech_kpis_v1';
 const KPI_SEED=[
-  {id:'k1',eje:'AT',nombre:'Tiempo promedio de cobertura de vacantes',unidad:'días',meta:30,actual:'',notas:'',dir:'menor'},
-  {id:'k2',eje:'AT',nombre:'Tasa de retención a 6 meses (nuevos ingresos)',unidad:'%',meta:85,actual:'',notas:'',dir:'mayor'},
-  {id:'k3',eje:'AT',nombre:'Tasa de retención a 12 meses (nuevos ingresos)',unidad:'%',meta:80,actual:'',notas:'',dir:'mayor'},
-  {id:'k4',eje:'AT',nombre:'% posiciones clave cubiertas vs. plantilla planeada',unidad:'%',meta:90,actual:'',notas:'',dir:'mayor'},
-  {id:'k5',eje:'CA',nombre:'Horas de capacitación por colaborador (trimestral)',unidad:'hrs',meta:8,actual:'',notas:'',dir:'mayor'},
-  {id:'k6',eje:'CA',nombre:'% de adopción del LMS de Juniper',unidad:'%',meta:70,actual:'',notas:'',dir:'mayor'},
-  {id:'k7',eje:'CA',nombre:'% de avance DNC ejecutada vs. planeada',unidad:'%',meta:80,actual:'',notas:'',dir:'mayor'},
-  {id:'k8',eje:'DF',nombre:'NPS interno programa Hellena (líderes)',unidad:'pts',meta:70,actual:'',notas:'',dir:'mayor'},
-  {id:'k9',eje:'DF',nombre:'% de líderes aplicando entrevistas SMART',unidad:'%',meta:80,actual:'',notas:'',dir:'mayor'},
-  {id:'k10',eje:'DF',nombre:'Colaboradores activos en upskilling / reskilling',unidad:'personas',meta:15,actual:'',notas:'',dir:'mayor'},
-  {id:'k11',eje:'CC',nombre:'Score de pulsos de clima',unidad:'/ 10',meta:7.5,actual:'',notas:'',dir:'mayor'},
-  {id:'k12',eje:'CC',nombre:'Tasa de participación en pulsos de clima',unidad:'%',meta:70,actual:'',notas:'Meta mínima: 70% (ya logrado en encuesta de comunicación)'},
-  {id:'k13',eje:'CC',nombre:'Insignias entregadas por periodo',unidad:'insignias',meta:20,actual:'',notas:'',dir:'mayor'},
-  {id:'k14',eje:'PE',nombre:'% colaboradores con documentación completa',unidad:'%',meta:95,actual:'',notas:'',dir:'mayor'},
-  {id:'k15',eje:'PE',nombre:'Tiempo de respuesta a solicitudes internas de RH',unidad:'días',meta:2,actual:'',notas:'',dir:'menor'},
-  {id:'k16',eje:'PE',nombre:'Avance política de sueldos y salarios (fases)',unidad:'%',meta:100,actual:'',notas:'3 fases: descriptivas, benchmark, política',dir:'mayor'},
+  {id:'k1',eje:'AT',nombre:'Tiempo promedio de cobertura de vacantes',unidad:'días',meta:30,actual:'',notas:'',formula:'AUTO · Días hábiles promedio desde fecha solicitud hasta fecha ingreso de vacantes cubiertas',dir:'menor'},
+  {id:'k2',eje:'AT',nombre:'Tasa de retención a 6 meses (nuevos ingresos)',unidad:'%',meta:85,actual:'',notas:'',formula:'Colaboradores que cumplen 6 meses sin baja ÷ total ingresos del periodo × 100 · Fuente: Supercompany',dir:'mayor'},
+  {id:'k3',eje:'AT',nombre:'Tasa de retención a 12 meses (nuevos ingresos)',unidad:'%',meta:80,actual:'',notas:'',formula:'Colaboradores que cumplen 12 meses sin baja ÷ total ingresos del periodo × 100 · Fuente: Supercompany',dir:'mayor'},
+  {id:'k4',eje:'AT',nombre:'% posiciones clave cubiertas vs. plantilla planeada',unidad:'%',meta:90,actual:'',notas:'',formula:'AUTO · Vacantes cubiertas ÷ plantilla activa × 100',dir:'mayor'},
+  {id:'k5',eje:'CA',nombre:'Horas de capacitación por colaborador (trimestral)',unidad:'hrs',meta:8,actual:'',notas:'',formula:'Total horas capacitación ÷ total colaboradores activos · Fuente: LMS Juniper / registros RH',dir:'mayor'},
+  {id:'k7',eje:'CA',nombre:'% de avance DNC ejecutada vs. planeada',unidad:'%',meta:80,actual:'',notas:'',formula:'Acciones DNC ejecutadas ÷ acciones DNC planeadas × 100 · Fuente: seguimiento Hellena',dir:'mayor'},
+  {id:'k8',eje:'DF',nombre:'NPS interno programa Hellena (líderes)',unidad:'pts',meta:70,actual:'',notas:'',formula:'% promotores − % detractores · Escala 0-10 · Fuente: encuesta Hellena',dir:'mayor'},
+  {id:'k9',eje:'DF',nombre:'% de líderes aplicando entrevistas SMART',unidad:'%',meta:80,actual:'',notas:'',formula:'Líderes que aplican entrevistas SMART ÷ total líderes × 100 · Fuente: seguimiento Alexa/RH',dir:'mayor'},
+  {id:'k10',eje:'DF',nombre:'Colaboradores activos en upskilling / reskilling',unidad:'personas',meta:15,actual:'',notas:'',formula:'Conteo directo de colaboradores inscritos en programas de desarrollo · Fuente: LMS / registros RH',dir:'mayor'},
+  {id:'k11',eje:'CC',nombre:'Score de pulsos de clima',unidad:'/ 10',meta:7.5,actual:'',notas:'',formula:'Promedio ponderado de respuestas en escala 1-10 · Fuente: encuesta pulsos de clima',dir:'mayor'},
+  {id:'k12',eje:'CC',nombre:'Tasa de participación en pulsos de clima',unidad:'%',meta:70,actual:'',notas:'',formula:'Colaboradores que respondieron ÷ total invitados × 100 · Meta mínima: 70%',dir:'mayor'},
+  {id:'k13',eje:'CC',nombre:'Insignias entregadas por periodo',unidad:'insignias',meta:20,actual:'',notas:'',formula:'Conteo directo de insignias entregadas en el periodo · Fuente: registro programa reconocimiento',dir:'mayor'},
+  {id:'k14',eje:'PE',nombre:'% colaboradores con documentación completa',unidad:'%',meta:95,actual:'',notas:'',formula:'Expedientes completos ÷ total plantilla × 100 · Fuente: Supercompany / expedientes RH',dir:'mayor'},
+  {id:'k16',eje:'PE',nombre:'Avance política de sueldos y salarios',unidad:'%',meta:100,actual:'',notas:'',formula:'AUTO · Entregables completados ÷ total entregables proyecto Sueldos y Salarios × 100',dir:'mayor'},
 ];
 
 function loadKPIs(){try{const r=localStorage.getItem(KPI_KEY);return r?JSON.parse(r):JSON.parse(JSON.stringify(KPI_SEED));}catch{return JSON.parse(JSON.stringify(KPI_SEED));}}
@@ -2130,7 +2129,109 @@ function kpiBarPct(k){
 
 function barColor(color){return{green:'#4ade80',yellow:'#fad83f',red:'#f87171',gray:'var(--border)'}[color];}
 
+// ── AUTO-KPIs desde datos del tablero ──
+function autoKPIs(){
+  const hoy=new Date();
+  const mesActual=hoy.getMonth();
+  const anioActual=hoy.getFullYear();
+
+  // k1 — Tiempo promedio de cobertura (cubiertas: sol → ingreso)
+  const cubiertas=vacs.filter(v=>v.fechaSolicitud&&v.fechaIngreso&&['cubierta','cubierta-fuera'].includes(v.status));
+  if(cubiertas.length){
+    const tprom=Math.round(cubiertas.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,v.fechaIngreso),0)/cubiertas.length);
+    const k1=kpis.find(k=>k.id==='k1');
+    if(k1){ k1.actual=tprom; k1.auto=true; k1.notas=k1.notas||'Calculado automáticamente desde vacantes cubiertas'; }
+  }
+
+  // k4 — % posiciones clave cubiertas vs plantilla
+  const meta=loadVacMeta();
+  const plantilla=parseFloat(meta.plantilla)||0;
+  if(plantilla>0){
+    const cubiertasN=vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
+    const pct=Math.round(cubiertasN/plantilla*100*10)/10;
+    const k4=kpis.find(k=>k.id==='k4');
+    if(k4){ k4.actual=pct; k4.auto=true; k4.notas=k4.notas||'Calculado automáticamente: '+cubiertasN+' cubiertas / '+plantilla+' plantilla'; }
+  }
+
+  // k16 — Avance política de sueldos (entregables SH completados)
+  if(typeof sh!=='undefined'&&sh&&sh.sh){
+    const totalSH=sh.sh.length;
+    const donoSH=sh.sh.filter(i=>i.status==='entregado'||i.status==='completado').length;
+    if(totalSH>0){
+      const pctSH=Math.round(donoSH/totalSH*100);
+      const k16=kpis.find(k=>k.id==='k16');
+      if(k16){ k16.actual=pctSH; k16.auto=true; k16.notas=k16.notas||'Calculado automáticamente: '+donoSH+' de '+totalSH+' entregables SH completados'; }
+    }
+  }
+
+  // Nota: otros KPIs siguen siendo manuales (retención, NPS, capacitación, etc.)
+}
+
+// ── KPI HISTORIAL ──
+const KPI_HIST_KEY='hostech_kpi_hist_v1';
+function loadKpiHist(){try{return JSON.parse(localStorage.getItem(KPI_HIST_KEY))||{};}catch{return {};}}
+function saveKpiHist(hist){
+  localStorage.setItem(KPI_HIST_KEY,JSON.stringify(hist));
+  syncToSheets('kpi_hist',hist);
+}
+
+function registrarMes(kpiId){
+  const k=kpis.find(x=>x.id===kpiId);
+  if(!k||k.actual==='') { alert('Primero captura el valor actual antes de registrar el mes.'); return; }
+  const hoy=new Date();
+  const mes=hoy.getMonth(); // 0-11
+  const anio=hoy.getFullYear();
+  const hist=loadKpiHist();
+  if(!hist[kpiId]) hist[kpiId]=[];
+  // Reemplazar si ya existe registro de este mes/año
+  const idx=hist[kpiId].findIndex(h=>h.mes===mes&&h.anio===anio);
+  const entry={mes,anio,valor:parseFloat(k.actual),meta:k.meta,dir:k.dir||'mayor'};
+  if(idx>=0) hist[kpiId][idx]=entry; else hist[kpiId].push(entry);
+  saveKpiHist(hist);
+  renderKPIs();
+}
+
+function kpiHistHtml(kpiId, meta, dir, unidad){
+  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const anioActual=new Date().getFullYear();
+  const mesActual=new Date().getMonth();
+  const hist=loadKpiHist();
+  const registros=hist[kpiId]||[];
+  if(!registros.length) return '';
+  const porMes=MESES.map((m,i)=>registros.find(h=>h.mes===i&&h.anio===anioActual)||null);
+  const hayAlguno=porMes.some(r=>r!==null);
+  if(!hayAlguno) return '';
+  const cols=porMes.map((r,i)=>{
+    if(!r){
+      const opacity=i>mesActual?'0.3':'0.5';
+      return `<div style="text-align:center;opacity:${opacity}">
+        <div style="font-size:9px;font-weight:600;color:#8a7f75;margin-bottom:3px">${m}</div>
+        <div style="font-size:11px;color:#c4bbb0">–</div>
+      </div>`;
+    }
+    const pct=r.dir==='menor'?(r.meta/r.valor):(r.valor/r.meta);
+    const dot=pct>=0.9?'#4ade80':pct>=0.7?'#fad83f':'#f87171';
+    const esMes=i===mesActual;
+    return `<div style="text-align:center;background:${esMes?'rgba(255,255,255,0.08)':'transparent'};border-radius:6px;padding:3px 2px">
+      <div style="font-size:9px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:3px">${MESES[i]}</div>
+      <div style="width:6px;height:6px;border-radius:50%;background:${dot};margin:0 auto 3px"></div>
+      <div style="font-size:10px;font-weight:700;color:#fff">${r.valor}</div>
+    </div>`;
+  });
+  return `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
+    <div style="font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:6px">Historial ${anioActual}</div>
+    <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px">${cols.join('')}</div>
+  </div>`;
+}
+
 function renderKPIs(){
+  // Primero inyecta los valores automáticos
+  autoKPIs();
+
+  const MESES_FULL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const mesNombre=MESES_FULL[new Date().getMonth()];
+  const hist=loadKpiHist();
+
   const grupos={AT:[],CA:[],DF:[],CC:[],PE:[]};
   kpis.forEach(k=>{ if(grupos[k.eje]) grupos[k.eje].push(k); });
   Object.entries(grupos).forEach(([eje, list])=>{
@@ -2138,15 +2239,23 @@ function renderKPIs(){
     if(!el)return;
     el.innerHTML=list.map(k=>{
       const s=semaforo(k), bp=kpiBarPct(k), bc=barColor(s.color);
+      const autoTag=k.auto?`<span style="font-size:9px;font-weight:700;letter-spacing:.05em;background:#fad83f;color:#5a4a00;padding:1px 6px;border-radius:4px;margin-left:6px">AUTO</span>`:'';
+      // Buscar formula del seed si no está en el kpi guardado
+      const seedK=KPI_SEED.find(s=>s.id===k.id);
+      const formula=k.formula||(seedK?seedK.formula:'');
+      const mesActual=new Date().getMonth(), anioActual=new Date().getFullYear();
+      const yaRegistrado=(hist[k.id]||[]).some(h=>h.mes===mesActual&&h.anio===anioActual);
+      const histHtml=kpiHistHtml(k.id, k.meta, k.dir||'mayor', k.unidad);
       return `<div class="kpi-card ${s.color}">
         <div class="kpi-eje">${k.eje}</div>
-        <div class="kpi-name">${k.nombre}</div>
+        <div class="kpi-name">${k.nombre}${autoTag}</div>
+        ${formula?`<div style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:3px;margin-bottom:4px;line-height:1.4">${formula}</div>`:''}
         <div class="kpi-semaforo"><span class="sem-dot" style="background:${s.dot}"></span>${s.label}</div>
         <div class="kpi-row">
           <div class="kpi-actual-wrap">
-            <div class="kpi-actual-lbl">Valor actual</div>
+            <div class="kpi-actual-lbl">Valor actual${k.auto?' · automático':''}</div>
             <div style="display:flex;align-items:baseline;gap:4px">
-              <input class="kpi-actual-input" type="number" value="${k.actual}" placeholder="–" onchange="updKPI('${k.id}','actual',this.value)" style="width:90px">
+              <input class="kpi-actual-input" type="number" value="${k.actual}" placeholder="–" onchange="updKPI('${k.id}','actual',this.value);kpis.find(x=>x.id==='${k.id}').auto=false;" style="width:90px${k.auto?';background:#fefce8':''}">
               <span class="kpi-unit">${k.unidad}</span>
             </div>
           </div>
@@ -2156,7 +2265,11 @@ function renderKPIs(){
           </div>
         </div>
         <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${bp}%;background:${bc}"></div></div>
-        <textarea class="kpi-note-input" placeholder="Nota o contexto..." oninput="updKPI('${k.id}','notas',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="resize:none;overflow:hidden;min-height:28px;line-height:1.4">${(k.notas||'').replace(/</g,'&lt;')}</textarea>
+        <button onclick="registrarMes('${k.id}')" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 12px;border-radius:7px;background:${yaRegistrado?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.15)'};color:${yaRegistrado?'rgba(255,255,255,0.5)':'#fff'};border:1px solid rgba(255,255,255,0.2);cursor:pointer;width:100%;margin-top:8px;font-weight:500">
+          ${yaRegistrado?'✓ '+mesNombre+' registrado':'📌 Registrar '+mesNombre}
+        </button>
+        ${histHtml}
+        <textarea class="kpi-note-input" placeholder="Nota o contexto..." oninput="updKPI('${k.id}','notas',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="resize:none;overflow:hidden;min-height:28px;line-height:1.4;margin-top:8px">${(k.notas||'').replace(/</g,'&lt;')}</textarea>
       </div>`;
     }).join('');
   });
