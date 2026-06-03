@@ -1035,6 +1035,8 @@ async function initApp(){
   // Renderiza siempre al final
   render();
   renderEjecutivo();
+  renderBajas();
+  renderVacMetrics();
 }
 
 const KEY='hostech_rh2026_v1';
@@ -1617,7 +1619,7 @@ function updBaja(id,field,val){
 function renderBajas(){
   const tbody=document.getElementById('bajas-body');
   const empty=document.getElementById('bajas-empty');
-  if(!tbody)return;
+  if(!tbody) return; // Solo retorna si el DOM no existe aún
   const MESES_LABEL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const anioActual=new Date().getFullYear();
   const lista=filtroBajasMes!==null?bajas.filter(b=>{
