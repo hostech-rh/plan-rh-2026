@@ -621,7 +621,7 @@ tr:hover td{background:var(--white)}
           <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#10100f" id="vac-bajas-n">0</div>
           <span style="font-size:12px;color:#C40E91;font-weight:500" id="vac-bajas-chevron">▾ ver detalle</span>
         </div>
-        <div style="font-size:11px;color:#8a7f75">dato manual · Supercompany</div>
+        <div style="font-size:11px;color:#8a7f75" id="vac-bajas-sub">dato manual · Supercompany</div>
       </div>
       <!-- Rotación calculada -->
       <div style="background:#fad83f;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
@@ -677,18 +677,22 @@ tr:hover td{background:var(--white)}
       </div>
     </div>
 
-    <!-- GRÁFICAS POR MES -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem">
-      <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem">
-        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes solicitadas por mes</div>
-        <div id="vac-chart-sol" style="display:flex;gap:6px;align-items:flex-end;height:80px"></div>
-        <div id="vac-chart-sol-labels" style="display:flex;gap:6px;margin-top:4px"></div>
-      </div>
-      <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem">
-        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes cubiertas por mes</div>
-        <div id="vac-chart-cub" style="display:flex;gap:6px;align-items:flex-end;height:80px"></div>
-        <div id="vac-chart-cub-labels" style="display:flex;gap:6px;margin-top:4px"></div>
-      </div>
+    <!-- ROTACIÓN POR MES -->
+    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Rotación por mes</div>
+      <div id="vac-rot-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
+    </div>
+
+    <!-- VACANTES POR MES -->
+    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes solicitadas por mes</div>
+      <div id="vac-sol-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
+    </div>
+
+    <!-- VACANTES CUBIERTAS POR MES -->
+    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes cubiertas por mes</div>
+      <div id="vac-cub-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
     </div>
 
     <div class="vac-summary" id="vac-summary"></div>
@@ -1295,9 +1299,14 @@ function renderEjecutivo(){
 
   const meta=loadVacMeta?loadVacMeta():{plantilla:''};
   const plantilla=parseFloat(meta.plantilla)||0;
-  const numBajas=(typeof bajas!=='undefined')?bajas.length:0;
+  const hoyE=new Date();
+  const numBajasE=(typeof bajas!=='undefined')?bajas.filter(b=>{
+    if(!b.fecha)return false;
+    const d=new Date(b.fecha+'T12:00:00');
+    return d.getMonth()===hoyE.getMonth()&&d.getFullYear()===hoyE.getFullYear();
+  }).length:0;
   const rotEl=document.getElementById('exec-rotacion');
-  if(rotEl) rotEl.textContent=plantilla>0?(numBajas/plantilla*100).toFixed(1)+'%':'–';
+  if(rotEl) rotEl.textContent=plantilla>0?(numBajasE/plantilla*100).toFixed(1)+'%':'–';
 
   // Heatmap
   const MES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -1373,29 +1382,34 @@ function renderEjecutivo(){
   });}
   document.getElementById('exec-pending').innerHTML=pendHtml;
 
-  // Vacantes
+  // Vacantes — solo totales, sin detalle de nombres
   let vacHtml='';
   if(typeof vacs==='undefined'||!vacs.length){
     vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">No hay vacantes registradas</div>';
   } else {
-    const shown=vacs.filter(v=>!['cubierta'].includes(v.status)).slice(0,5);
-    if(!shown.length){vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">✓ Todas las vacantes cubiertas</div>';}
-    else{shown.forEach(v=>{
-      const sv=STATUS_VAC.find(x=>x.val===v.status)||STATUS_VAC[0];
-      const dias=diasActivosStr(v);
-      const dotColors={'en-tiempo':'#fad83f','atrasada':'#fad83f','fuera':'#e05533','urgente':'#e05533','por-ingresar':'#4563ff','cubierta-fuera':'#4563ff','cubierta':'#10100f'};
-      const dc=dotColors[v.status]||'#c4bbb0';
-      vacHtml+=`<div class="pend-row">
-        <div style="display:flex;align-items:center;gap:8px;flex:1">
-          <div class="st-dot" style="background:${dc};flex-shrink:0"></div>
-          <div class="pend-nm" style="margin:0">${v.puesto||'Sin nombre'}</div>
+    const activas=vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status));
+    const urgentes=activas.filter(v=>v.status==='urgente');
+    const atrasadas=activas.filter(v=>['atrasada','fuera'].includes(v.status));
+    const enTiempo=activas.filter(v=>v.status==='en-tiempo');
+    const porIngresar=vacs.filter(v=>v.status==='por-ingresar');
+    const cubiertas=vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status));
+    const filas=[
+      {label:'Vacantes activas',   n:activas.length,    color:'#4563ff'},
+      {label:'Urgentes',           n:urgentes.length,   color:'#e05533'},
+      {label:'Atrasadas / fuera',  n:atrasadas.length,  color:'#fad83f'},
+      {label:'En tiempo',          n:enTiempo.length,   color:'#1a6b3a'},
+      {label:'Por ingresar',       n:porIngresar.length,color:'#4A9FDC'},
+      {label:'Cubiertas',          n:cubiertas.length,  color:'#10100f'},
+    ];
+    vacHtml=filas.map(f=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${f.color};flex-shrink:0"></div>
+          <div style="font-size:13px;color:var(--ink)">${f.label}</div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-          <div class="pend-mes">${sv.label}</div>
-          ${dias!=='–'?`<div style="font-size:10px;color:var(--ink-muted)">${dias} días háb.</div>`:''}
-        </div>
-      </div>`;
-    });}
+        <div style="font-size:14px;font-weight:700;color:${f.n>0?f.color:'var(--ink-muted)'}">${f.n}</div>
+      </div>`).join('');
+    if(!activas.length) vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">✓ Todas las vacantes cubiertas</div>';
   }
   document.getElementById('exec-vacantes').innerHTML=vacHtml;
 }
@@ -1505,12 +1519,24 @@ function renderVacMetrics(){
   const pEl=document.getElementById('vac-plantilla');
   if(pEl&&!pEl.value) pEl.value=meta.plantilla;
 
-  // Conteo de bajas desde el registro
-  const numBajas=bajas.length;
+  // Conteo de bajas del MES ACTUAL desde el registro
+  const hoy=new Date();
+  const mesActual=hoy.getMonth();
+  const anioActual=hoy.getFullYear();
+  const bajasMes=bajas.filter(b=>{
+    if(!b.fecha)return false;
+    const d=new Date(b.fecha+'T12:00:00');
+    return d.getMonth()===mesActual && d.getFullYear()===anioActual;
+  });
+  const numBajas=bajasMes.length;
+  const MESES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   const bajasNEl=document.getElementById('vac-bajas-n');
   if(bajasNEl) bajasNEl.textContent=numBajas;
+  // Actualiza subtítulo de la tarjeta con el mes
+  const bajasSubEl=document.getElementById('vac-bajas-sub');
+  if(bajasSubEl) bajasSubEl.textContent=MESES_SHORT[mesActual]+' · dato manual · Supercompany';
 
-  // Rotación calculada desde el registro de bajas
+  // Rotación calculada solo con bajas del mes actual
   const plantilla=parseFloat(meta.plantilla)||0;
   const rotEl=document.getElementById('vac-rotacion');
   if(rotEl) rotEl.textContent=plantilla>0?(numBajas/plantilla*100).toFixed(1)+'%':'–';
@@ -1529,8 +1555,100 @@ function renderVacMetrics(){
   if(aEl) aEl.textContent=activas;
   if(cEl) cEl.textContent=cubiertasN;
 
-  // Gráficas por mes
-  renderVacChart();
+  // Cuadritos por mes
+  renderRotMes();
+  renderVacSolMes();
+  renderVacCubMes();
+}
+
+function renderVacCubMes(){
+  const el=document.getElementById('vac-cub-mes');
+  if(!el)return;
+  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const hoy=new Date();
+  const mesActual=hoy.getMonth();
+  const anioActual=hoy.getFullYear();
+
+  el.innerHTML=MESES.map((m,i)=>{
+    const n=vacs.filter(v=>{
+      if(!v.fechaIngreso||!['cubierta','cubierta-fuera'].includes(v.status))return false;
+      const d=new Date(v.fechaIngreso+'T12:00:00');
+      return d.getMonth()===i && d.getFullYear()===anioActual;
+    }).length;
+    const esMes=i===mesActual;
+    const tieneData=n>0;
+    const color='#1a6b3a';
+    const bg=tieneData?(esMes?color:'#3d3530'):'transparent';
+    const txtColor=tieneData?'#fff':(esMes?color:'#8a7f75');
+    const border=esMes?`2px solid ${color}`:'1px solid #e0d8ce';
+    const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
+    return `<div style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${tieneData?'rgba(255,255,255,0.7)':(esMes?color:'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
+      <div style="font-size:15px;font-weight:700;color:${txtColor};line-height:1">${tieneData?n:'–'}</div>
+      ${tieneData?`<div style="font-size:9px;color:rgba(255,255,255,0.6);margin-top:2px">cubierta${n!==1?'s':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderVacSolMes(){
+  const el=document.getElementById('vac-sol-mes');
+  if(!el)return;
+  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const hoy=new Date();
+  const mesActual=hoy.getMonth();
+  const anioActual=hoy.getFullYear();
+
+  el.innerHTML=MESES.map((m,i)=>{
+    const vacsMes=vacs.filter(v=>{
+      if(!v.fechaSolicitud)return false;
+      const d=new Date(v.fechaSolicitud+'T12:00:00');
+      return d.getMonth()===i && d.getFullYear()===anioActual;
+    });
+    const n=vacsMes.length;
+    const esMes=i===mesActual;
+    const tieneData=n>0;
+    const bg=tieneData?(esMes?'#4563ff':'#3d3530'):'transparent';
+    const txtColor=tieneData?'#fff':(esMes?'#4563ff':'#8a7f75');
+    const border=esMes?'2px solid #4563ff':'1px solid #e0d8ce';
+    const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
+    return `<div style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${tieneData?'rgba(255,255,255,0.7)':(esMes?'#4563ff':'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
+      <div style="font-size:15px;font-weight:700;color:${txtColor};line-height:1">${tieneData?n:'–'}</div>
+      ${tieneData?`<div style="font-size:9px;color:${tieneData?'rgba(255,255,255,0.6)':'#c8c7be'};margin-top:2px">vacante${n!==1?'s':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderRotMes(){
+  const el=document.getElementById('vac-rot-mes');
+  if(!el)return;
+  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const hoy=new Date();
+  const mesActual=hoy.getMonth();
+  const anioActual=hoy.getFullYear();
+  const meta=loadVacMeta();
+  const plantilla=parseFloat(meta.plantilla)||0;
+
+  el.innerHTML=MESES.map((m,i)=>{
+    const bajasDelMes=bajas.filter(b=>{
+      if(!b.fecha)return false;
+      const d=new Date(b.fecha+'T12:00:00');
+      return d.getMonth()===i && d.getFullYear()===anioActual;
+    });
+    const n=bajasDelMes.length;
+    const pct=plantilla>0?(n/plantilla*100).toFixed(1):null;
+    const esMes=i===mesActual;
+    const tieneData=n>0;
+    const bg=tieneData?(esMes?'#C40E91':'#3d3530'):'transparent';
+    const txtColor=tieneData?'#fff':(esMes?'#C40E91':'#8a7f75');
+    const border=esMes?'2px solid #C40E91':'1px solid #e0d8ce';
+    const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
+    return `<div style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${tieneData?'rgba(255,255,255,0.7)':(esMes?'#C40E91':'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
+      <div style="font-size:15px;font-weight:700;color:${txtColor};line-height:1">${pct!==null?pct+'%':'–'}</div>
+      ${tieneData?`<div style="font-size:9px;color:${tieneData?'rgba(255,255,255,0.6)':'#c8c7be'};margin-top:2px">${n} baja${n!==1?'s':''}</div>`:''}
+    </div>`;
+  }).join('');
 }
 
 function renderVacChart(){
