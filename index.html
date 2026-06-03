@@ -602,9 +602,6 @@ tr:hover td{background:var(--white)}
         <h2>Vacantes <em>&amp; Bajas</em></h2>
         <p>Seguimiento · días hábiles con corte cada viernes · corte actual: <strong id="vac-corte"></strong></p>
       </div>
-      <div>
-        <button class="vac-add-btn" onclick="addVacante()">+ Nueva vacante</button>
-      </div>
     </div>
 
     <!-- MÉTRICAS SUPERIORES -->
@@ -695,6 +692,9 @@ tr:hover td{background:var(--white)}
     </div>
 
     <div class="vac-summary" id="vac-summary"></div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="vac-add-btn" onclick="addVacante()">+ Nueva vacante</button>
+    </div>
     <div style="overflow-x:auto">
       <table class="vac-table">
         <thead><tr>
@@ -983,7 +983,7 @@ async function initApp(){
       if(remote.hellena) { hbl=remote.hellena;    localStorage.setItem(HBL_KEY,JSON.stringify(hbl)); }
       if(remote.sueldos) { sh=remote.sueldos;     localStorage.setItem(SH_KEY,JSON.stringify(sh)); }
       if(remote.comite)  { comiteItems=remote.comite; localStorage.setItem(COM_KEY,JSON.stringify(comiteItems)); }
-      if(remote.bajas)   { bajas=remote.bajas;     localStorage.setItem(BAJAS_KEY,JSON.stringify(bajas)); }
+      if(remote.bajas)   { bajas=remote.bajas;     localStorage.setItem(BAJAS_KEY,JSON.stringify(bajas)); renderBajas(); renderVacMetrics(); }
       if(!remote.tareas)   syncToSheets('tareas',tasks);
       if(!remote.vacantes) syncToSheets('vacantes',vacs);
       if(!remote.kpis)     syncToSheets('kpis',kpis);
