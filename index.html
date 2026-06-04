@@ -1402,7 +1402,7 @@ function renderEjecutivo(){
 
   // Heatmap
   const MES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const NOW_IDX=4; // Mayo
+  const NOW_IDX=new Date().getMonth(); // Mes actual dinámico
   let heatHtml='';
   MES.forEach((m,i)=>{
     const all=tasks.filter(t=>t.mes===m);
