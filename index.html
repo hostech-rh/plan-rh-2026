@@ -1932,15 +1932,16 @@ function autoStatus(v){
     v.status = dias <= (v.meta||30) ? 'cubierta' : 'cubierta-fuera';
     return;
   }
-  // Si tiene fecha selección pero no ingreso → por ingresar
+  // Si tiene fecha selección pero no ingreso → por ingresar (semáforo basado en sol→sel)
   if(v.fechaSeleccion && !v.fechaIngreso){ v.status='por-ingresar'; return; }
-  // Sin fechas especiales → calcular por días activos
+  // Sin fechas especiales → calcular semáforo por días activos hasta hoy
   if(!v.fechaSolicitud){ v.status='en-tiempo'; return; }
-  const dias=daysBetween(v.fechaSolicitud, new Date().toISOString().slice(0,10));
+  const hoy=new Date().toISOString().slice(0,10);
+  const dias=daysBetween(v.fechaSolicitud, hoy);
   const meta=v.meta||20;
   if(dias < meta*0.7)      v.status='en-tiempo';
-  else if(dias < meta)     v.status='atrasada';
-  else if(dias < meta*1.5) v.status='fuera';
+  else if(dias < meta)     v.status='en-tiempo';
+  else if(dias < meta*1.5) v.status='atrasada';
   else                     v.status='urgente';
 }
 
@@ -1978,8 +1979,18 @@ function daysBetween(d1,d2){
 
 function diasActivosStr(v){
   if(!v.fechaSolicitud)return'–';
-  // Si ya ingresó usar fecha ingreso, si no usar hoy
-  const end=v.fechaIngreso||new Date().toISOString().slice(0,10);
+  const hoy=new Date().toISOString().slice(0,10);
+  let end;
+  if(['cubierta','cubierta-fuera'].includes(v.status)&&v.fechaIngreso&&v.fechaIngreso<=hoy){
+    // Vacante cerrada y ya ingresó → usar fecha ingreso
+    end=v.fechaIngreso;
+  } else if(v.fechaSeleccion&&v.fechaSeleccion<=hoy){
+    // Candidato seleccionado pero aún no ingresa → congelar en fecha selección
+    end=v.fechaSeleccion;
+  } else {
+    // Aún en búsqueda → contar hasta hoy
+    end=hoy;
+  }
   return daysBetween(v.fechaSolicitud,end);
 }
 
