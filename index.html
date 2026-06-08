@@ -1948,16 +1948,26 @@ function autoStatus(v){
 // Último viernes como fecha de corte
 function lastFriday(){
   const d=new Date();
-  const daysSinceFri=(d.getDay()+2)%7; // Fri=0, Sat=1, Sun=2, Mon=3...
-  d.setDate(d.getDate()-daysSinceFri);
-  return d.toISOString().slice(0,10);
+  // Si hoy es viernes (5), usar hoy; si no, retroceder al último viernes
+  const dow=d.getDay(); // 0=Dom, 1=Lun, ..., 5=Vie, 6=Sab
+  const diff=dow===5?0:(dow===6?1:(dow+2)); // días a retroceder para llegar al viernes
+  d.setDate(d.getDate()-(dow===5?0:(dow===6?1:dow+2)));
+  // Recalcular con lógica más simple
+  const today=new Date();
+  const day=today.getDay();
+  const daysBack=day===5?0:day===6?1:(day+2)%7;
+  today.setDate(today.getDate()-daysBack);
+  return today.toISOString().slice(0,10);
 }
 
 function daysBetween(d1,d2){
   if(!d1||!d2)return 0;
   let start=new Date(d1+'T12:00:00'), end=new Date(d2+'T12:00:00');
   if(start>end)[start,end]=[end,start];
-  let count=0, cur=new Date(start);
+  // No contar el día de inicio — contar desde el día siguiente
+  let count=0;
+  let cur=new Date(start);
+  cur.setDate(cur.getDate()+1); // empezar desde el día siguiente
   while(cur<=end){
     const dow=cur.getDay();
     if(dow!==0&&dow!==6)count++;
@@ -1968,8 +1978,8 @@ function daysBetween(d1,d2){
 
 function diasActivosStr(v){
   if(!v.fechaSolicitud)return'–';
-  // Si ya ingresó, usar fecha de ingreso; si no, corte al último viernes
-  const end=v.fechaIngreso||lastFriday();
+  // Si ya ingresó usar fecha ingreso, si no usar hoy
+  const end=v.fechaIngreso||new Date().toISOString().slice(0,10);
   return daysBetween(v.fechaSolicitud,end);
 }
 
