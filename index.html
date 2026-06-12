@@ -539,30 +539,16 @@ tr:hover td{background:var(--white)}
     <!-- TARJETAS UNIFORMES — vacantes -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">
 
-      <div style="background:#4563ff;border-radius:12px;padding:1rem 1.25rem;cursor:default">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7)">Vacantes solicitadas</div>
-          <div style="display:flex;align-items:center;gap:4px" onclick="event.stopPropagation()">
-            <button onclick="cambiarMesVac(-1)" style="background:rgba(255,255,255,.2);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#fff;display:flex;align-items:center;justify-content:center;padding:0">‹</button>
-            <span id="exec-vac-mes-label" style="font-size:10px;font-weight:700;color:#fff;min-width:26px;text-align:center"></span>
-            <button onclick="cambiarMesVac(1)" style="background:rgba(255,255,255,.2);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#fff;display:flex;align-items:center;justify-content:center;padding:0">›</button>
-          </div>
-        </div>
+      <div style="background:#4563ff;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:opacity .15s" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:8px">Vacantes activas</div>
         <div style="font-family:'DM Serif Display',serif;font-size:40px;line-height:1;color:#fff" id="exec-vac">0</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px">en el mes</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px">en proceso</div>
       </div>
 
-      <div style="background:#d4f5e0;border-radius:12px;padding:1rem 1.25rem;cursor:default">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#1a6b3a;opacity:.7">Vacantes cubiertas</div>
-          <div style="display:flex;align-items:center;gap:4px" onclick="event.stopPropagation()">
-            <button onclick="cambiarMesCub(-1)" style="background:rgba(26,107,58,.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#1a6b3a;display:flex;align-items:center;justify-content:center;padding:0">‹</button>
-            <span id="exec-cub-mes-label" style="font-size:10px;font-weight:700;color:#1a6b3a;min-width:26px;text-align:center"></span>
-            <button onclick="cambiarMesCub(1)" style="background:rgba(26,107,58,.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#1a6b3a;display:flex;align-items:center;justify-content:center;padding:0">›</button>
-          </div>
-        </div>
+      <div style="background:#d4f5e0;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:opacity .15s" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#1a6b3a;opacity:.7;margin-bottom:8px">Vacantes cubiertas</div>
         <div style="font-family:'DM Serif Display',serif;font-size:40px;line-height:1;color:#1a6b3a" id="exec-vac-cubiertas">0</div>
-        <div style="font-size:11px;color:#1a6b3a;opacity:.5;margin-top:6px">en el mes</div>
+        <div style="font-size:11px;color:#1a6b3a;opacity:.5;margin-top:6px">acumuladas</div>
       </div>
 
       <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:opacity .15s" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
@@ -571,15 +557,8 @@ tr:hover td{background:var(--white)}
         <div style="font-size:11px;color:#8a7f75;margin-top:6px">días hábiles</div>
       </div>
 
-      <div style="background:#f9d0ee;border-radius:12px;padding:1rem 1.25rem;cursor:default" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#C40E91;opacity:.8">Rotación</div>
-          <div style="display:flex;align-items:center;gap:4px" onclick="event.stopPropagation()">
-            <button onclick="cambiarMesRot(-1)" style="background:rgba(196,14,145,.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#C40E91;display:flex;align-items:center;justify-content:center;padding:0">‹</button>
-            <span id="exec-rot-mes-label" style="font-size:10px;font-weight:700;color:#C40E91;min-width:26px;text-align:center"></span>
-            <button onclick="cambiarMesRot(1)" style="background:rgba(196,14,145,.15);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;color:#C40E91;display:flex;align-items:center;justify-content:center;padding:0">›</button>
-          </div>
-        </div>
+      <div style="background:#f9d0ee;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:opacity .15s" onclick="document.querySelector('.ntab[onclick*=vacantes]').click()" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#C40E91;opacity:.8;margin-bottom:8px">Rotación del mes</div>
         <div style="font-family:'DM Serif Display',serif;font-size:40px;line-height:1;color:#C40E91" id="exec-rotacion">–</div>
         <div style="font-size:11px;color:#C40E91;opacity:.6;margin-top:6px">bajas / plantilla</div>
       </div>
@@ -623,6 +602,9 @@ tr:hover td{background:var(--white)}
         <h2>Vacantes <em>&amp; Bajas</em></h2>
         <p>Seguimiento · días hábiles con corte cada viernes · corte actual: <strong id="vac-corte"></strong></p>
       </div>
+      <div>
+        <button class="vac-add-btn" onclick="addVacante()">+ Nueva vacante</button>
+      </div>
     </div>
 
     <!-- MÉTRICAS SUPERIORES -->
@@ -642,7 +624,7 @@ tr:hover td{background:var(--white)}
           <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#10100f" id="vac-bajas-n">0</div>
           <span style="font-size:12px;color:#C40E91;font-weight:500" id="vac-bajas-chevron">▾ ver detalle</span>
         </div>
-        <div style="font-size:11px;color:#8a7f75" id="vac-bajas-sub">dato manual · Supercompany</div>
+        <div style="font-size:11px;color:#8a7f75">dato manual · Supercompany</div>
       </div>
       <!-- Rotación calculada -->
       <div style="background:#fad83f;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
@@ -650,17 +632,11 @@ tr:hover td{background:var(--white)}
         <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#10100f" id="vac-rotacion">–</div>
         <div style="font-size:11px;color:rgba(16,16,15,.4)">bajas / plantilla × 100</div>
       </div>
-      <!-- Tiempo promedio vacantes activas -->
+      <!-- Tiempo promedio reclutar -->
       <div style="background:#4563ff;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6)">T. prom. activas</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#fff" id="vac-tprom-activas">–</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.5)">días háb. sin cubrir</div>
-      </div>
-      <!-- Tiempo promedio vacantes cubiertas (KPI) -->
-      <div style="background:#3d3530;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5)">T. prom. cubiertas</div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6)">Tiempo prom. reclutamiento</div>
         <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#fff" id="vac-tprom">–</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.4)">días háb. · KPI</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5)">días hábiles promedio</div>
       </div>
       <!-- Vacantes activas -->
       <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
@@ -685,7 +661,6 @@ tr:hover td{background:var(--white)}
         </div>
         <button onclick="addBaja()" style="font-family:'DM Sans',sans-serif;font-size:12px;padding:7px 14px;border-radius:8px;background:#C40E91;color:#fff;border:none;cursor:pointer;font-weight:500;white-space:nowrap">+ Agregar baja</button>
       </div>
-      <div id="bajas-filtro-label"></div>
       <div style="overflow-x:auto">
         <table class="vac-table">
           <thead><tr>
@@ -705,40 +680,21 @@ tr:hover td{background:var(--white)}
       </div>
     </div>
 
-    <!-- ROTACIÓN POR MES -->
-    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Rotación por mes</div>
-      <div id="vac-rot-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
-    </div>
-
-    <!-- BAJAS POR TIPO Y MES -->
-    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:1rem">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75">Bajas por tipo</div>
-        <div style="display:flex;gap:10px">
-          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#4563ff;font-weight:500"><span style="width:8px;height:8px;border-radius:50%;background:#4563ff;display:inline-block"></span>Voluntaria</span>
-          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#C40E91;font-weight:500"><span style="width:8px;height:8px;border-radius:50%;background:#C40E91;display:inline-block"></span>Involuntaria</span>
-        </div>
+    <!-- GRÁFICAS POR MES -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1.5rem">
+      <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes solicitadas por mes</div>
+        <div id="vac-chart-sol" style="display:flex;gap:6px;align-items:flex-end;height:80px"></div>
+        <div id="vac-chart-sol-labels" style="display:flex;gap:6px;margin-top:4px"></div>
       </div>
-      <div id="vac-bajas-tipo-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
-    </div>
-
-    <!-- VACANTES POR MES -->
-    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes solicitadas por mes</div>
-      <div id="vac-sol-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
-    </div>
-
-    <!-- VACANTES CUBIERTAS POR MES -->
-    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes cubiertas por mes</div>
-      <div id="vac-cub-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
+      <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Vacantes cubiertas por mes</div>
+        <div id="vac-chart-cub" style="display:flex;gap:6px;align-items:flex-end;height:80px"></div>
+        <div id="vac-chart-cub-labels" style="display:flex;gap:6px;margin-top:4px"></div>
+      </div>
     </div>
 
     <div class="vac-summary" id="vac-summary"></div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-      <button class="vac-add-btn" onclick="addVacante()">+ Nueva vacante</button>
-    </div>
     <div style="overflow-x:auto">
       <table class="vac-table">
         <thead><tr>
@@ -1027,9 +983,7 @@ async function initApp(){
       if(remote.hellena) { hbl=remote.hellena;    localStorage.setItem(HBL_KEY,JSON.stringify(hbl)); }
       if(remote.sueldos) { sh=remote.sueldos;     localStorage.setItem(SH_KEY,JSON.stringify(sh)); }
       if(remote.comite)  { comiteItems=remote.comite; localStorage.setItem(COM_KEY,JSON.stringify(comiteItems)); }
-      if(remote.bajas)   { bajas=remote.bajas; localStorage.setItem(BAJAS_KEY,JSON.stringify(bajas)); setTimeout(()=>{ renderBajas(); renderVacMetrics(); },100); }
-      if(remote.plantilla_snaps){ localStorage.setItem(PLANTILLA_SNAP_KEY,JSON.stringify(remote.plantilla_snaps)); }
-      if(remote.kpi_hist){ localStorage.setItem(KPI_HIST_KEY,JSON.stringify(remote.kpi_hist)); }
+      if(remote.bajas)   { bajas=remote.bajas;     localStorage.setItem(BAJAS_KEY,JSON.stringify(bajas)); }
       if(!remote.tareas)   syncToSheets('tareas',tasks);
       if(!remote.vacantes) syncToSheets('vacantes',vacs);
       if(!remote.kpis)     syncToSheets('kpis',kpis);
@@ -1037,7 +991,6 @@ async function initApp(){
       if(!remote.sueldos)  syncToSheets('sueldos',sh);
       if(!remote.comite)   syncToSheets('comite',comiteItems);
       if(!remote.bajas)    syncToSheets('bajas',bajas);
-      if(!remote.plantilla_snaps) syncToSheets('plantilla_snaps',loadPlantillaSnaps());
       setSavedLabel('Datos sincronizados ✓');
     } else {
       setSavedLabel('Modo local · sin conexión');
@@ -1048,9 +1001,6 @@ async function initApp(){
   // Renderiza siempre al final
   render();
   renderEjecutivo();
-  renderBajas();
-  renderBajasTipoMes();
-  renderVacMetrics();
 }
 
 const KEY='hostech_rh2026_v1';
@@ -1169,10 +1119,7 @@ function render(){
     g[m].forEach(t=>{
       const sc=ESHORT[t.eje]||'',stc=scls(t.status);
       h+=`<tr>
-        <td style="color:var(--ink-muted);font-size:12px;white-space:nowrap">
-          ${t.mes}
-          ${(t.reprogramadaDe||t.reprogramada)?`<div style="margin-top:3px;display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;background:#fad83f;color:#5a4a00;padding:2px 6px;border-radius:4px;white-space:nowrap">↩ REPROG.</div>`:''}
-        </td>
+        <td style="color:var(--ink-muted);font-size:12px;white-space:nowrap">${t.mes}</td>
         <td><span class="eb e${sc}" title="${t.eje}">${sc}</span></td>
         <td style="min-width:180px;max-width:280px">
           <textarea class="ni" style="font-size:13px;color:var(--ink);background:transparent;border-color:transparent;padding:2px 4px;width:100%;line-height:1.4;cursor:text;resize:none;overflow:hidden;min-height:28px"
@@ -1207,36 +1154,10 @@ function upd(id,field,val){
   const t=tasks.find(x=>x.id===id);
   if(t){
     t[field]=val;
-    // Si acaba de seleccionar el mes destino de reprogramación → copiar la tarea
-    if(field==='nuevoMes' && val && t.status==='Reprogramada'){
-      // Verificar que no exista ya una copia para ese mes
-      const yaExiste=tasks.some(x=>x.reprogramadaDe===id&&x.mes===val);
-      if(!yaExiste){
-        const copia={
-          id: Date.now(),
-          mes: val,
-          eje: t.eje,
-          accion: t.accion,
-          resp: t.resp,
-          status: 'Sin iniciar',
-          notas: (t.notas?t.notas+' · ':'')+'Reprogramada desde '+t.mes,
-          entregable: t.entregable||'',
-          nuevoMes: '',
-          reprogramadaDe: t.id,
-          reprogramada: true
-        };
-        tasks.push(copia);
-        setTimeout(()=>{
-          const rows=document.querySelectorAll('#tbody tr');
-          rows[rows.length-1]?.scrollIntoView({behavior:'smooth',block:'center'});
-        },120);
-      }
-    }
     dsave();
     renderMeta();
     const active=document.activeElement;
     const isTyping=active&&(active.tagName==='TEXTAREA'||active.tagName==='INPUT')&&active.type!=='date'&&active.type!=='number';
-    if(!isTyping) render();
     if(!isTyping&&document.getElementById('tab-dashboard').style.display!=='none') renderDash();
   }
 }
@@ -1361,27 +1282,10 @@ function renderEjecutivo(){
   document.getElementById('exec-init').textContent=s.init;
   document.getElementById('exec-prog').textContent=s.prog;
   // Vacantes activas y cubiertas
-  const anioActual=new Date().getFullYear();
-
-  // Vacantes solicitadas en el mes seleccionado
-  const vacDelMes=(typeof vacs!=='undefined')?vacs.filter(v=>{
-    if(!v.fechaSolicitud)return false;
-    const d=new Date(v.fechaSolicitud+'T12:00:00');
-    return d.getMonth()===execVacMes && d.getFullYear()===anioActual;
-  }).length:0;
-  document.getElementById('exec-vac').textContent=vacDelMes;
-  const vacLabelEl=document.getElementById('exec-vac-mes-label');
-  if(vacLabelEl) vacLabelEl.textContent=MESES_SHORT_ROT[execVacMes];
-
-  // Vacantes cubiertas en el mes seleccionado
-  const cubDelMes=(typeof vacs!=='undefined')?vacs.filter(v=>{
-    if(!v.fechaIngreso||!['cubierta','cubierta-fuera'].includes(v.status))return false;
-    const d=new Date(v.fechaIngreso+'T12:00:00');
-    return d.getMonth()===execCubMes && d.getFullYear()===anioActual;
-  }).length:0;
-  document.getElementById('exec-vac-cubiertas').textContent=cubDelMes;
-  const cubLabelEl=document.getElementById('exec-cub-mes-label');
-  if(cubLabelEl) cubLabelEl.textContent=MESES_SHORT_ROT[execCubMes];
+  const vacActivas=(typeof vacs!=='undefined')?vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length:0;
+  const vacCubiertas=(typeof vacs!=='undefined')?vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length:0;
+  document.getElementById('exec-vac').textContent=vacActivas;
+  document.getElementById('exec-vac-cubiertas').textContent=vacCubiertas;
 
   // Tiempo promedio y rotación
   const cubiertas=(typeof vacs!=='undefined')?vacs.filter(v=>v.fechaSolicitud&&v.fechaIngreso&&['cubierta','cubierta-fuera'].includes(v.status)):[];
@@ -1389,20 +1293,15 @@ function renderEjecutivo(){
   const tpEl=document.getElementById('exec-tprom');
   if(tpEl) tpEl.textContent=tprom?tprom+' días':'–';
 
-  const plantilla=getPlantillaParaMes(execRotMes, anioActual);
-  const numBajasE=(typeof bajas!=='undefined')?bajas.filter(b=>{
-    if(!b.fecha)return false;
-    const d=new Date(b.fecha+'T12:00:00');
-    return d.getMonth()===execRotMes && d.getFullYear()===anioActual;
-  }).length:0;
+  const meta=loadVacMeta?loadVacMeta():{plantilla:''};
+  const plantilla=parseFloat(meta.plantilla)||0;
+  const numBajas=(typeof bajas!=='undefined')?bajas.length:0;
   const rotEl=document.getElementById('exec-rotacion');
-  if(rotEl) rotEl.textContent=plantilla>0?(numBajasE/plantilla*100).toFixed(1)+'%':'–';
-  const labelEl=document.getElementById('exec-rot-mes-label');
-  if(labelEl) labelEl.textContent=MESES_SHORT_ROT[execRotMes];
+  if(rotEl) rotEl.textContent=plantilla>0?(numBajas/plantilla*100).toFixed(1)+'%':'–';
 
   // Heatmap
   const MES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const NOW_IDX=new Date().getMonth(); // Mes actual dinámico
+  const NOW_IDX=4; // Mayo
   let heatHtml='';
   MES.forEach((m,i)=>{
     const all=tasks.filter(t=>t.mes===m);
@@ -1474,49 +1373,34 @@ function renderEjecutivo(){
   });}
   document.getElementById('exec-pending').innerHTML=pendHtml;
 
-  // Vacantes — solo totales, sin detalle de nombres
+  // Vacantes
   let vacHtml='';
   if(typeof vacs==='undefined'||!vacs.length){
     vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">No hay vacantes registradas</div>';
   } else {
-    const activas=vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status));
-    const urgentes=activas.filter(v=>v.status==='urgente');
-    const atrasadas=activas.filter(v=>['atrasada','fuera'].includes(v.status));
-    const enTiempo=activas.filter(v=>v.status==='en-tiempo');
-    const porIngresar=vacs.filter(v=>v.status==='por-ingresar');
-    const cubiertas=vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status));
-    const filas=[
-      {label:'Vacantes activas',   n:activas.length,    color:'#4563ff'},
-      {label:'Urgentes',           n:urgentes.length,   color:'#e05533'},
-      {label:'Atrasadas / fuera',  n:atrasadas.length,  color:'#fad83f'},
-      {label:'En tiempo',          n:enTiempo.length,   color:'#1a6b3a'},
-      {label:'Por ingresar',       n:porIngresar.length,color:'#4A9FDC'},
-      {label:'Cubiertas',          n:cubiertas.length,  color:'#10100f'},
-    ];
-    vacHtml=filas.map(f=>`
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:8px;height:8px;border-radius:50%;background:${f.color};flex-shrink:0"></div>
-          <div style="font-size:13px;color:var(--ink)">${f.label}</div>
+    const shown=vacs.filter(v=>!['cubierta'].includes(v.status)).slice(0,5);
+    if(!shown.length){vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">✓ Todas las vacantes cubiertas</div>';}
+    else{shown.forEach(v=>{
+      const sv=STATUS_VAC.find(x=>x.val===v.status)||STATUS_VAC[0];
+      const dias=diasActivosStr(v);
+      const dotColors={'en-tiempo':'#fad83f','atrasada':'#fad83f','fuera':'#e05533','urgente':'#e05533','por-ingresar':'#4563ff','cubierta-fuera':'#4563ff','cubierta':'#10100f'};
+      const dc=dotColors[v.status]||'#c4bbb0';
+      vacHtml+=`<div class="pend-row">
+        <div style="display:flex;align-items:center;gap:8px;flex:1">
+          <div class="st-dot" style="background:${dc};flex-shrink:0"></div>
+          <div class="pend-nm" style="margin:0">${v.puesto||'Sin nombre'}</div>
         </div>
-        <div style="font-size:14px;font-weight:700;color:${f.n>0?f.color:'var(--ink-muted)'}">${f.n}</div>
-      </div>`).join('');
-    if(!activas.length) vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">✓ Todas las vacantes cubiertas</div>';
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+          <div class="pend-mes">${sv.label}</div>
+          ${dias!=='–'?`<div style="font-size:10px;color:var(--ink-muted)">${dias} días háb.</div>`:''}
+        </div>
+      </div>`;
+    });}
   }
   document.getElementById('exec-vacantes').innerHTML=vacHtml;
 }
 
-// Filtros activos de mes en pestaña vacantes
-let filtroBajasMes=null;   // null = todos, 0-11 = mes específico
-let filtroVacSolMes=null;
-let filtroVacCubMes=null;
-let execRotMes=new Date().getMonth();
-let execVacMes=new Date().getMonth();
-let execCubMes=new Date().getMonth();
-const MESES_SHORT_ROT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-function cambiarMesRot(dir){ execRotMes=(execRotMes+dir+12)%12; renderEjecutivo(); }
-function cambiarMesVac(dir){ execVacMes=(execVacMes+dir+12)%12; renderEjecutivo(); }
-function cambiarMesCub(dir){ execCubMes=(execCubMes+dir+12)%12; renderEjecutivo(); }
+// ── VACANTES ──
 const VAC_KEY='hostech_vac_v1';
 const STATUS_VAC=[
   {val:'en-tiempo',   label:'En tiempo',           cls:'vs-tiempo'},
@@ -1527,47 +1411,12 @@ const STATUS_VAC=[
   {val:'cubierta-fuera',label:'Cubierta f/tiempo',  cls:'vs-cubierta-fuera'},
   {val:'por-ingresar',label:'Por ingresar',         cls:'vs-por-ingresar'},
 ];
-// ── VACANTES META (plantilla + snapshots históricos) ──
+// ── VACANTES META (plantilla) ──
 const VAC_META_KEY='hostech_vac_meta_v1';
-const PLANTILLA_SNAP_KEY='hostech_plantilla_snaps_v1';
-
 function loadVacMeta(){try{return JSON.parse(localStorage.getItem(VAC_META_KEY))||{plantilla:''};}catch{return{plantilla:''};}}
-
-function loadPlantillaSnaps(){try{return JSON.parse(localStorage.getItem(PLANTILLA_SNAP_KEY))||[];}catch{return[];}}
-
-// Devuelve la plantilla vigente para un mes/año dado (usa el snapshot más reciente ≤ ese mes)
-function getPlantillaParaMes(mes, anio){
-  const snaps=loadPlantillaSnaps();
-  if(!snaps.length) return parseFloat(loadVacMeta().plantilla)||0;
-  // Filtrar snapshots anteriores o iguales al mes pedido
-  const anteriores=snaps.filter(s=>s.anio<anio||(s.anio===anio&&s.mes<=mes));
-  if(!anteriores.length){
-    // Usar el más antiguo disponible
-    const sorted=[...snaps].sort((a,b)=>a.anio-b.anio||a.mes-b.mes);
-    return sorted[0].plantilla;
-  }
-  // Usar el más reciente de los anteriores
-  const sorted=anteriores.sort((a,b)=>b.anio-a.anio||b.mes-a.mes);
-  return sorted[0].plantilla;
-}
-
 function saveVacMeta(){
-  const val=document.getElementById('vac-plantilla').value;
-  const meta={plantilla:val};
+  const meta={plantilla:document.getElementById('vac-plantilla').value};
   localStorage.setItem(VAC_META_KEY,JSON.stringify(meta));
-  // Guardar snapshot del mes actual
-  if(val){
-    const hoy=new Date();
-    const snaps=loadPlantillaSnaps();
-    const mesActual=hoy.getMonth();
-    const anioActual=hoy.getFullYear();
-    // Reemplazar si ya existe snap de este mes, si no agregar
-    const idx=snaps.findIndex(s=>s.mes===mesActual&&s.anio===anioActual);
-    const snap={mes:mesActual,anio:anioActual,plantilla:parseFloat(val)};
-    if(idx>=0) snaps[idx]=snap; else snaps.push(snap);
-    localStorage.setItem(PLANTILLA_SNAP_KEY,JSON.stringify(snaps));
-    syncToSheets('plantilla_snaps',snaps);
-  }
   renderVacMetrics();
 }
 
@@ -1581,7 +1430,6 @@ function saveBajas(){
   setSavedLabel('Guardado '+t);
   syncToSheets('bajas',bajas);
   renderBajas();
-  renderBajasTipoMes();
   renderVacMetrics();
 }
 
@@ -1591,20 +1439,9 @@ function toggleBajas(e){
   const chevron=document.getElementById('vac-bajas-chevron');
   const card=document.getElementById('vac-bajas-card');
   const open=panel.style.display!=='none';
-  if(open){
-    panel.style.display='none';
-    chevron.textContent='▾ ver detalle';
-    card.style.borderColor='#e0d8ce';
-    filtroBajasMes=null;
-    renderRotMes();
-  } else {
-    panel.style.display='block';
-    chevron.textContent='▴ cerrar';
-    card.style.borderColor='#C40E91';
-    filtroBajasMes=null;
-    // Pequeño delay para asegurar que el DOM esté visible antes de renderizar
-    setTimeout(()=>renderBajas(), 30);
-  }
+  panel.style.display=open?'none':'block';
+  chevron.textContent=open?'▾ ver detalle':'▴ cerrar';
+  card.style.borderColor=open?'#e0d8ce':'#C40E91';
 }
 
 function addBaja(){
@@ -1634,33 +1471,14 @@ function updBaja(id,field,val){
 function renderBajas(){
   const tbody=document.getElementById('bajas-body');
   const empty=document.getElementById('bajas-empty');
-  if(!tbody) return; // Solo retorna si el DOM no existe aún
-  const MESES_LABEL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const anioActual=new Date().getFullYear();
-  const lista=filtroBajasMes!==null?bajas.filter(b=>{
-    if(!b.fecha)return false;
-    const d=new Date(b.fecha+'T12:00:00');
-    return d.getMonth()===filtroBajasMes&&d.getFullYear()===anioActual;
-  }):bajas;
-
-  // Indicador de filtro activo
-  let filtroHtml='';
-  if(filtroBajasMes!==null){
-    filtroHtml=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 12px;background:#fce8f7;border-radius:8px;font-size:12px;color:#C40E91;font-weight:500">
-      <span>Filtrando: ${MESES_LABEL[filtroBajasMes]} · ${lista.length} baja${lista.length!==1?'s':''}</span>
-      <button onclick="toggleFiltroBajas(${filtroBajasMes})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#C40E91;font-size:14px;line-height:1">× ver todas</button>
-    </div>`;
-  }
-  const filtroEl=document.getElementById('bajas-filtro-label');
-  if(filtroEl) filtroEl.innerHTML=filtroHtml;
-
-  if(!lista.length){
+  if(!tbody)return;
+  if(!bajas.length){
     tbody.innerHTML='';
-    if(empty){empty.style.display='block';empty.textContent=filtroBajasMes!==null?`Sin bajas en ${MESES_LABEL[filtroBajasMes]}`:'Sin bajas registradas · clic en "+ Agregar baja" para empezar';}
+    if(empty) empty.style.display='block';
     return;
   }
   if(empty) empty.style.display='none';
-  tbody.innerHTML=lista.map(b=>`<tr>
+  tbody.innerHTML=bajas.map(b=>`<tr>
     <td><input class="vac-input" type="date" value="${b.fecha||''}" onchange="updBaja('${b.id}','fecha',this.value)" style="min-width:120px"></td>
     <td style="min-width:170px"><input id="bp-${b.id}" class="vac-input" type="text" value="${(b.persona||'').replace(/"/g,'&quot;')}" placeholder="Nombre completo" onchange="updBaja('${b.id}','persona',this.value)" onblur="renderBajas()" style="width:100%"></td>
     <td style="min-width:170px"><input class="vac-input" type="text" value="${(b.puesto||'').replace(/"/g,'&quot;')}" placeholder="Puesto" onchange="updBaja('${b.id}','puesto',this.value)" onblur="renderBajas()" style="width:100%"></td>
@@ -1687,35 +1505,17 @@ function renderVacMetrics(){
   const pEl=document.getElementById('vac-plantilla');
   if(pEl&&!pEl.value) pEl.value=meta.plantilla;
 
-  // Conteo de bajas del MES ACTUAL desde el registro
-  const hoy=new Date();
-  const mesActual=hoy.getMonth();
-  const anioActual=hoy.getFullYear();
-  const bajasMes=bajas.filter(b=>{
-    if(!b.fecha)return false;
-    const d=new Date(b.fecha+'T12:00:00');
-    return d.getMonth()===mesActual && d.getFullYear()===anioActual;
-  });
-  const numBajas=bajasMes.length;
-  const MESES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  // Conteo de bajas desde el registro
+  const numBajas=bajas.length;
   const bajasNEl=document.getElementById('vac-bajas-n');
   if(bajasNEl) bajasNEl.textContent=numBajas;
-  // Actualiza subtítulo de la tarjeta con el mes
-  const bajasSubEl=document.getElementById('vac-bajas-sub');
-  if(bajasSubEl) bajasSubEl.textContent=MESES_SHORT[mesActual]+' · dato manual · Supercompany';
 
-  // Rotación calculada con plantilla del mes actual (snapshot)
-  const plantillaMesActual=getPlantillaParaMes(mesActual, anioActual);
+  // Rotación calculada desde el registro de bajas
+  const plantilla=parseFloat(meta.plantilla)||0;
   const rotEl=document.getElementById('vac-rotacion');
-  if(rotEl) rotEl.textContent=plantillaMesActual>0?(numBajas/plantillaMesActual*100).toFixed(1)+'%':'–';
+  if(rotEl) rotEl.textContent=plantilla>0?(numBajas/plantilla*100).toFixed(1)+'%':'–';
 
-  // Tiempo promedio vacantes ACTIVAS (días sin cubrir hasta hoy)
-  const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&!['cubierta','cubierta-fuera'].includes(v.status));
-  const tpromActivas=actvasConFecha.length?Math.round(actvasConFecha.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,new Date().toISOString().slice(0,10)),0)/actvasConFecha.length):null;
-  const tpaEl=document.getElementById('vac-tprom-activas');
-  if(tpaEl) tpaEl.textContent=tpromActivas?tpromActivas+' días':'–';
-
-  // Tiempo promedio vacantes CUBIERTAS (sol → ingreso, KPI)
+  // Tiempo promedio reclutamiento
   const cubiertas=vacs.filter(v=>v.fechaSolicitud&&v.fechaIngreso&&['cubierta','cubierta-fuera'].includes(v.status));
   const tprom=cubiertas.length?Math.round(cubiertas.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,v.fechaIngreso),0)/cubiertas.length):null;
   const tpEl=document.getElementById('vac-tprom');
@@ -1729,175 +1529,46 @@ function renderVacMetrics(){
   if(aEl) aEl.textContent=activas;
   if(cEl) cEl.textContent=cubiertasN;
 
-  // Cuadritos por mes
-  renderRotMes();
-  renderBajasTipoMes();
-  renderVacSolMes();
-  renderVacCubMes();
+  // Gráficas por mes
+  renderVacChart();
 }
 
-function renderBajasTipoMes(){
-  const el=document.getElementById('vac-bajas-tipo-mes');
-  if(!el)return;
-  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const hoy=new Date();
-  const mesActual=hoy.getMonth();
-  const anioActual=hoy.getFullYear();
+function renderVacChart(){
+  const MESES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  // Solicitadas por mes (por fechaSolicitud)
+  const solPorMes={};
+  vacs.forEach(v=>{
+    if(!v.fechaSolicitud)return;
+    const m=new Date(v.fechaSolicitud+'T12:00:00').getMonth();
+    solPorMes[m]=(solPorMes[m]||0)+1;
+  });
+  // Cubiertas por mes (por fechaIngreso)
+  const cubPorMes={};
+  vacs.filter(v=>v.fechaIngreso&&['cubierta','cubierta-fuera'].includes(v.status)).forEach(v=>{
+    const m=new Date(v.fechaIngreso+'T12:00:00').getMonth();
+    cubPorMes[m]=(cubPorMes[m]||0)+1;
+  });
 
-  el.innerHTML=MESES.map((m,i)=>{
-    const del_mes=bajas.filter(b=>{
-      if(!b.fecha)return false;
-      const d=new Date(b.fecha+'T12:00:00');
-      return d.getMonth()===i&&d.getFullYear()===anioActual;
-    });
-    const vol=del_mes.filter(b=>b.motivo==='voluntaria').length;
-    const inv=del_mes.filter(b=>b.motivo==='involuntaria').length;
-    const total=del_mes.length;
-    const esMes=i===mesActual;
-    const tieneData=total>0;
-    const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
-    const border=esMes?'2px solid #8a7f75':'1px solid #e0d8ce';
-    const bg=tieneData?'#3d3530':'transparent';
-    const labelColor=tieneData?'rgba(255,255,255,0.6)':(esMes?'#8a7f75':'#c4bbb0');
-    return `<div style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${labelColor};margin-bottom:6px">${m.toUpperCase()}</div>
-      ${tieneData?`
-        <div style="display:flex;justify-content:center;gap:6px;margin-bottom:2px">
-          <div style="text-align:center">
-            <div style="font-size:13px;font-weight:700;color:#4563ff;line-height:1">${vol}</div>
-            <div style="font-size:8px;color:rgba(255,255,255,0.4);margin-top:1px">VOL</div>
-          </div>
-          <div style="width:1px;background:rgba(255,255,255,0.15);margin:0 2px"></div>
-          <div style="text-align:center">
-            <div style="font-size:13px;font-weight:700;color:#C40E91;line-height:1">${inv}</div>
-            <div style="font-size:8px;color:rgba(255,255,255,0.4);margin-top:1px">INV</div>
-          </div>
-        </div>
-        <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-top:3px">${total} total</div>
-      `:`<div style="font-size:14px;color:${esMes?'#8a7f75':'#c4bbb0'}">–</div>`}
-    </div>`;
-  }).join('');
-}
-
-function renderVacCubMes(){
-  const el=document.getElementById('vac-cub-mes');
-  if(!el)return;
-  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const hoy=new Date();
-  const mesActual=hoy.getMonth();
-  const anioActual=hoy.getFullYear();
-
-  el.innerHTML=MESES.map((m,i)=>{
-    const n=vacs.filter(v=>{
-      if(!v.fechaIngreso||!['cubierta','cubierta-fuera'].includes(v.status))return false;
-      const d=new Date(v.fechaIngreso+'T12:00:00');
-      return d.getMonth()===i && d.getFullYear()===anioActual;
-    }).length;
-    const esFiltro=filtroVacCubMes===i;
-    const tieneData=n>0;
-    const esMes=i===mesActual;
-    const color='#1a6b3a';
-    const bg=esFiltro?color:(tieneData?(esMes?color:'#3d3530'):'transparent');
-    const txtColor=(tieneData||esFiltro)?'#fff':(esMes?color:'#8a7f75');
-    const border=esFiltro||esMes?`2px solid ${color}`:'1px solid #e0d8ce';
-    const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
-    const cursor=tieneData||esFiltro?'pointer':'default';
-    return `<div onclick="toggleFiltroVacCub(${i})" style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s;cursor:${cursor}">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${(tieneData||esFiltro)?'rgba(255,255,255,0.7)':(esMes?color:'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
-      <div style="font-size:15px;font-weight:700;color:${txtColor};line-height:1">${tieneData?n:'–'}</div>
-      ${tieneData?`<div style="font-size:9px;color:rgba(255,255,255,0.6);margin-top:2px">cubierta${n!==1?'s':''}</div>`:''}
-    </div>`;
-  }).join('');
-}
-
-function renderVacSolMes(){
-  const el=document.getElementById('vac-sol-mes');
-  if(!el)return;
-  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const hoy=new Date();
-  const mesActual=hoy.getMonth();
-  const anioActual=hoy.getFullYear();
-
-  el.innerHTML=MESES.map((m,i)=>{
-    const vacsMes=vacs.filter(v=>{
-      if(!v.fechaSolicitud)return false;
-      const d=new Date(v.fechaSolicitud+'T12:00:00');
-      return d.getMonth()===i && d.getFullYear()===anioActual;
-    });
-    const n=vacsMes.length;
-    const esMes=i===mesActual;
-    const tieneData=n>0;
-    const esFiltro=filtroVacSolMes===i;
-    const color='#4563ff';
-    const bg=esFiltro?color:(tieneData?(esMes?color:'#3d3530'):'transparent');
-    const txtColor=(tieneData||esFiltro)?'#fff':(esMes?color:'#8a7f75');
-    const border=esFiltro||esMes?`2px solid ${color}`:'1px solid #e0d8ce';
-    const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
-    const cursor=tieneData||esFiltro?'pointer':'default';
-    return `<div onclick="toggleFiltroVacSol(${i})" style="border:${border};border-radius:10px;padding:10px 6px;text-align:center;background:${bg};opacity:${opacity};transition:all .2s;cursor:${cursor}">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${(tieneData||esFiltro)?'rgba(255,255,255,0.7)':(esMes?color:'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
-      <div style="font-size:15px;font-weight:700;color:${txtColor};line-height:1">${tieneData?n:'–'}</div>
-      ${tieneData?`<div style="font-size:9px;color:rgba(255,255,255,0.6);margin-top:2px">vacante${n!==1?'s':''}</div>`:''}
-    </div>`;
-  }).join('');
-}
-
-function renderRotMes(){
-  const el=document.getElementById('vac-rot-mes');
-  if(!el)return;
-  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const hoy=new Date();
-  const mesActual=hoy.getMonth();
-  const anioActual=hoy.getFullYear();
-  const meta=loadVacMeta();
-  const plantilla=parseFloat(meta.plantilla)||0;
-
-  el.innerHTML=MESES.map((m,i)=>{
-    const bajasDelMes=bajas.filter(b=>{
-      if(!b.fecha)return false;
-      const d=new Date(b.fecha+'T12:00:00');
-      return d.getMonth()===i && d.getFullYear()===anioActual;
-    });
-    const n=bajasDelMes.length;
-    const plantillaMes=getPlantillaParaMes(i, anioActual);
-    const pct=plantillaMes>0?(n/plantillaMes*100).toFixed(1):null;
-    const esMes=i===mesActual;
-    const tieneData=n>0;
-    const esFiltro=filtroBajasMes===i;
-    const cursor=tieneData||esFiltro?'pointer':'default';
-    const opacity=(!tieneData&&i>mesActual)?'0.4':'1';
-    const borderFinal=esFiltro?'2px solid #C40E91':(esMes?'2px solid #C40E91':'1px solid #e0d8ce');
-    const bgFinal=esFiltro?'#C40E91':(tieneData?(esMes?'#C40E91':'#3d3530'):'transparent');
-    const txtFinal=esFiltro?'#fff':(tieneData?'#fff':(esMes?'#C40E91':'#8a7f75'));
-    return `<div onclick="toggleFiltroBajas(${i})" style="border:${borderFinal};border-radius:10px;padding:10px 6px;text-align:center;background:${bgFinal};opacity:${opacity};transition:all .2s;cursor:${cursor}">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${(tieneData||esFiltro)?'rgba(255,255,255,0.7)':(esMes?'#C40E91':'#8a7f75')};margin-bottom:4px">${m.toUpperCase()}</div>
-      <div style="font-size:15px;font-weight:700;color:${txtFinal};line-height:1">${pct!==null?pct+'%':'–'}</div>
-      ${tieneData?`<div style="font-size:9px;color:rgba(255,255,255,0.6);margin-top:2px">${n} baja${n!==1?'s':''}</div>`:''}
-    </div>`;
-  }).join('');
-}
-
-function toggleFiltroBajas(mes){
-  filtroBajasMes=filtroBajasMes===mes?null:mes;
-  const panel=document.getElementById('bajas-panel');
-  const chevron=document.getElementById('vac-bajas-chevron');
-  const card=document.getElementById('vac-bajas-card');
-  if(panel&&panel.style.display==='none'){
-    panel.style.display='block';
-    if(chevron) chevron.textContent='▴ cerrar';
-    if(card) card.style.borderColor='#C40E91';
+  function renderBar(containerId, labelId, data, color){
+    const el=document.getElementById(containerId);
+    const lel=document.getElementById(labelId);
+    if(!el||!lel)return;
+    const meses=Object.keys(data).map(Number).sort((a,b)=>a-b);
+    if(!meses.length){el.innerHTML='<div style="font-size:12px;color:#c8c7be;padding:8px">Sin datos aún</div>';lel.innerHTML='';return;}
+    const max=Math.max(...Object.values(data));
+    el.innerHTML=meses.map(m=>{
+      const v=data[m]||0;
+      const h=max?Math.round(v/max*72):0;
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+        <div style="font-size:11px;font-weight:600;color:#3d3530">${v}</div>
+        <div style="width:100%;max-width:36px;height:${h}px;min-height:4px;background:${color};border-radius:4px 4px 0 0"></div>
+      </div>`;
+    }).join('');
+    lel.innerHTML=meses.map(m=>`<div style="flex:1;text-align:center;font-size:10px;color:#8a7f75">${MESES_SHORT[m]}</div>`).join('');
   }
-  setTimeout(()=>{ renderBajas(); renderRotMes(); }, 30);
-}
-function toggleFiltroVacSol(mes){
-  filtroVacSolMes=filtroVacSolMes===mes?null:mes;
-  renderVacantes();
-  renderVacSolMes();
-}
-function toggleFiltroVacCub(mes){
-  filtroVacCubMes=filtroVacCubMes===mes?null:mes;
-  renderVacantes();
-  renderVacCubMes();
+
+  renderBar('vac-chart-sol','vac-chart-sol-labels',solPorMes,'#4563ff');
+  renderBar('vac-chart-cub','vac-chart-cub-labels',cubPorMes,'#1a6b3a');
 }
 
 function loadVac(){try{const r=localStorage.getItem(VAC_KEY);return r?JSON.parse(r):[];}catch{return[];}}
@@ -1932,16 +1603,15 @@ function autoStatus(v){
     v.status = dias <= (v.meta||30) ? 'cubierta' : 'cubierta-fuera';
     return;
   }
-  // Si tiene fecha selección pero no ingreso → por ingresar (semáforo basado en sol→sel)
+  // Si tiene fecha selección pero no ingreso → por ingresar
   if(v.fechaSeleccion && !v.fechaIngreso){ v.status='por-ingresar'; return; }
-  // Sin fechas especiales → calcular semáforo por días activos hasta hoy
+  // Sin fechas especiales → calcular por días activos
   if(!v.fechaSolicitud){ v.status='en-tiempo'; return; }
-  const hoy=new Date().toISOString().slice(0,10);
-  const dias=daysBetween(v.fechaSolicitud, hoy);
+  const dias=daysBetween(v.fechaSolicitud, new Date().toISOString().slice(0,10));
   const meta=v.meta||20;
   if(dias < meta*0.7)      v.status='en-tiempo';
-  else if(dias < meta)     v.status='en-tiempo';
-  else if(dias < meta*1.5) v.status='atrasada';
+  else if(dias < meta)     v.status='atrasada';
+  else if(dias < meta*1.5) v.status='fuera';
   else                     v.status='urgente';
 }
 
@@ -1949,26 +1619,16 @@ function autoStatus(v){
 // Último viernes como fecha de corte
 function lastFriday(){
   const d=new Date();
-  // Si hoy es viernes (5), usar hoy; si no, retroceder al último viernes
-  const dow=d.getDay(); // 0=Dom, 1=Lun, ..., 5=Vie, 6=Sab
-  const diff=dow===5?0:(dow===6?1:(dow+2)); // días a retroceder para llegar al viernes
-  d.setDate(d.getDate()-(dow===5?0:(dow===6?1:dow+2)));
-  // Recalcular con lógica más simple
-  const today=new Date();
-  const day=today.getDay();
-  const daysBack=day===5?0:day===6?1:(day+2)%7;
-  today.setDate(today.getDate()-daysBack);
-  return today.toISOString().slice(0,10);
+  const daysSinceFri=(d.getDay()+2)%7; // Fri=0, Sat=1, Sun=2, Mon=3...
+  d.setDate(d.getDate()-daysSinceFri);
+  return d.toISOString().slice(0,10);
 }
 
 function daysBetween(d1,d2){
   if(!d1||!d2)return 0;
   let start=new Date(d1+'T12:00:00'), end=new Date(d2+'T12:00:00');
   if(start>end)[start,end]=[end,start];
-  // No contar el día de inicio — contar desde el día siguiente
-  let count=0;
-  let cur=new Date(start);
-  cur.setDate(cur.getDate()+1); // empezar desde el día siguiente
+  let count=0, cur=new Date(start);
   while(cur<=end){
     const dow=cur.getDay();
     if(dow!==0&&dow!==6)count++;
@@ -1979,18 +1639,8 @@ function daysBetween(d1,d2){
 
 function diasActivosStr(v){
   if(!v.fechaSolicitud)return'–';
-  const hoy=new Date().toISOString().slice(0,10);
-  let end;
-  if(['cubierta','cubierta-fuera'].includes(v.status)&&v.fechaIngreso&&v.fechaIngreso<=hoy){
-    // Vacante cerrada y ya ingresó → usar fecha ingreso
-    end=v.fechaIngreso;
-  } else if(v.fechaSeleccion&&v.fechaSeleccion<=hoy){
-    // Candidato seleccionado pero aún no ingresa → congelar en fecha selección
-    end=v.fechaSeleccion;
-  } else {
-    // Aún en búsqueda → contar hasta hoy
-    end=hoy;
-  }
+  // Si ya ingresó, usar fecha de ingreso; si no, corte al último viernes
+  const end=v.fechaIngreso||lastFriday();
   return daysBetween(v.fechaSolicitud,end);
 }
 
@@ -2025,44 +1675,6 @@ function delVacante(id){
 }
 
 function renderVacantes(){
-  const MESES_LABEL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const anioActual=new Date().getFullYear();
-
-  // Aplicar filtro de mes si está activo
-  let listaVacs=vacs;
-  let filtroActivoLabel='';
-  if(filtroVacSolMes!==null){
-    listaVacs=vacs.filter(v=>{
-      if(!v.fechaSolicitud)return false;
-      const d=new Date(v.fechaSolicitud+'T12:00:00');
-      return d.getMonth()===filtroVacSolMes&&d.getFullYear()===anioActual;
-    });
-    filtroActivoLabel=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 12px;background:#eef0ff;border-radius:8px;font-size:12px;color:#4563ff;font-weight:500">
-      <span>Solicitadas en ${MESES_LABEL[filtroVacSolMes]} · ${listaVacs.length} vacante${listaVacs.length!==1?'s':''}</span>
-      <button onclick="toggleFiltroVacSol(${filtroVacSolMes})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#4563ff;font-size:14px;line-height:1">× ver todas</button>
-    </div>`;
-  } else if(filtroVacCubMes!==null){
-    listaVacs=vacs.filter(v=>{
-      if(!v.fechaIngreso||!['cubierta','cubierta-fuera'].includes(v.status))return false;
-      const d=new Date(v.fechaIngreso+'T12:00:00');
-      return d.getMonth()===filtroVacCubMes&&d.getFullYear()===anioActual;
-    });
-    filtroActivoLabel=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 12px;background:#e8f5ee;border-radius:8px;font-size:12px;color:#1a6b3a;font-weight:500">
-      <span>Cubiertas en ${MESES_LABEL[filtroVacCubMes]} · ${listaVacs.length} vacante${listaVacs.length!==1?'s':''}</span>
-      <button onclick="toggleFiltroVacCub(${filtroVacCubMes})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#1a6b3a;font-size:14px;line-height:1">× ver todas</button>
-    </div>`;
-  }
-
-  // Insertar label de filtro sobre la tabla
-  let filtroEl=document.getElementById('vac-tabla-filtro');
-  if(!filtroEl){
-    filtroEl=document.createElement('div');
-    filtroEl.id='vac-tabla-filtro';
-    const tableWrap=document.querySelector('#tab-vacantes .vac-table')?.closest('div[style*="overflow-x"]');
-    if(tableWrap) tableWrap.parentNode.insertBefore(filtroEl,tableWrap);
-  }
-  filtroEl.innerHTML=filtroActivoLabel;
-
   // Summary
   const total=vacs.length;
   const activas=vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length;
@@ -2080,10 +1692,10 @@ function renderVacantes(){
   // Rows
   const statusOpts=STATUS_VAC.map(s=>`<option value="${s.val}">${s.label}</option>`).join('');
   let html='';
-  if(!listaVacs.length){
-    html=`<tr><td colspan="10" style="padding:2rem;text-align:center;color:var(--ink-muted)">${filtroVacSolMes!==null||filtroVacCubMes!==null?'Sin vacantes en ese mes':'No hay vacantes registradas · haz clic en "+ Nueva vacante" para empezar'}</td></tr>`;
+  if(!vacs.length){
+    html='<tr><td colspan="10" style="padding:2rem;text-align:center;color:var(--ink-muted)">No hay vacantes registradas · haz clic en "+ Nueva vacante" para empezar</td></tr>';
   }
-  listaVacs.forEach(v=>{
+  vacs.forEach(v=>{
     const sv=STATUS_VAC.find(s=>s.val===v.status)||STATUS_VAC[0];
     const dias=diasActivosStr(v);
     const dc=typeof dias==='number'?diasColor(dias,v.meta):'transparent';
@@ -2110,20 +1722,22 @@ function renderVacantes(){
 
 const KPI_KEY='hostech_kpis_v1';
 const KPI_SEED=[
-  {id:'k1',eje:'AT',nombre:'Tiempo promedio de cobertura de vacantes',unidad:'días',meta:30,actual:'',notas:'',formula:'AUTO · Días hábiles promedio desde fecha solicitud hasta fecha ingreso de vacantes cubiertas',dir:'menor'},
-  {id:'k2',eje:'AT',nombre:'Tasa de retención a 6 meses (nuevos ingresos)',unidad:'%',meta:85,actual:'',notas:'',formula:'Colaboradores que cumplen 6 meses sin baja ÷ total ingresos del periodo × 100 · Fuente: Supercompany',dir:'mayor'},
-  {id:'k3',eje:'AT',nombre:'Tasa de retención a 12 meses (nuevos ingresos)',unidad:'%',meta:80,actual:'',notas:'',formula:'Colaboradores que cumplen 12 meses sin baja ÷ total ingresos del periodo × 100 · Fuente: Supercompany',dir:'mayor'},
-  {id:'k4',eje:'AT',nombre:'% posiciones clave cubiertas vs. plantilla planeada',unidad:'%',meta:90,actual:'',notas:'',formula:'AUTO · Vacantes cubiertas ÷ plantilla activa × 100',dir:'mayor'},
-  {id:'k5',eje:'CA',nombre:'Horas de capacitación por colaborador (trimestral)',unidad:'hrs',meta:8,actual:'',notas:'',formula:'Total horas capacitación ÷ total colaboradores activos · Fuente: LMS Juniper / registros RH',dir:'mayor'},
-  {id:'k7',eje:'CA',nombre:'% de avance DNC ejecutada vs. planeada',unidad:'%',meta:80,actual:'',notas:'',formula:'Acciones DNC ejecutadas ÷ acciones DNC planeadas × 100 · Fuente: seguimiento Hellena',dir:'mayor'},
-  {id:'k8',eje:'DF',nombre:'NPS interno programa Hellena (líderes)',unidad:'pts',meta:70,actual:'',notas:'',formula:'% promotores − % detractores · Escala 0-10 · Fuente: encuesta Hellena',dir:'mayor'},
-  {id:'k9',eje:'DF',nombre:'% de líderes aplicando entrevistas SMART',unidad:'%',meta:80,actual:'',notas:'',formula:'Líderes que aplican entrevistas SMART ÷ total líderes × 100 · Fuente: seguimiento Alexa/RH',dir:'mayor'},
-  {id:'k10',eje:'DF',nombre:'Colaboradores activos en upskilling / reskilling',unidad:'personas',meta:15,actual:'',notas:'',formula:'Conteo directo de colaboradores inscritos en programas de desarrollo · Fuente: LMS / registros RH',dir:'mayor'},
-  {id:'k11',eje:'CC',nombre:'Score de pulsos de clima',unidad:'/ 10',meta:7.5,actual:'',notas:'',formula:'Promedio ponderado de respuestas en escala 1-10 · Fuente: encuesta pulsos de clima',dir:'mayor'},
-  {id:'k12',eje:'CC',nombre:'Tasa de participación en pulsos de clima',unidad:'%',meta:70,actual:'',notas:'',formula:'Colaboradores que respondieron ÷ total invitados × 100 · Meta mínima: 70%',dir:'mayor'},
-  {id:'k13',eje:'CC',nombre:'Insignias entregadas por periodo',unidad:'insignias',meta:20,actual:'',notas:'',formula:'Conteo directo de insignias entregadas en el periodo · Fuente: registro programa reconocimiento',dir:'mayor'},
-  {id:'k14',eje:'PE',nombre:'% colaboradores con documentación completa',unidad:'%',meta:95,actual:'',notas:'',formula:'Expedientes completos ÷ total plantilla × 100 · Fuente: Supercompany / expedientes RH',dir:'mayor'},
-  {id:'k16',eje:'PE',nombre:'Avance política de sueldos y salarios',unidad:'%',meta:100,actual:'',notas:'',formula:'AUTO · Entregables completados ÷ total entregables proyecto Sueldos y Salarios × 100',dir:'mayor'},
+  {id:'k1',eje:'AT',nombre:'Tiempo promedio de cobertura de vacantes',unidad:'días',meta:30,actual:'',notas:'',dir:'menor'},
+  {id:'k2',eje:'AT',nombre:'Tasa de retención a 6 meses (nuevos ingresos)',unidad:'%',meta:85,actual:'',notas:'',dir:'mayor'},
+  {id:'k3',eje:'AT',nombre:'Tasa de retención a 12 meses (nuevos ingresos)',unidad:'%',meta:80,actual:'',notas:'',dir:'mayor'},
+  {id:'k4',eje:'AT',nombre:'% posiciones clave cubiertas vs. plantilla planeada',unidad:'%',meta:90,actual:'',notas:'',dir:'mayor'},
+  {id:'k5',eje:'CA',nombre:'Horas de capacitación por colaborador (trimestral)',unidad:'hrs',meta:8,actual:'',notas:'',dir:'mayor'},
+  {id:'k6',eje:'CA',nombre:'% de adopción del LMS de Juniper',unidad:'%',meta:70,actual:'',notas:'',dir:'mayor'},
+  {id:'k7',eje:'CA',nombre:'% de avance DNC ejecutada vs. planeada',unidad:'%',meta:80,actual:'',notas:'',dir:'mayor'},
+  {id:'k8',eje:'DF',nombre:'NPS interno programa Hellena (líderes)',unidad:'pts',meta:70,actual:'',notas:'',dir:'mayor'},
+  {id:'k9',eje:'DF',nombre:'% de líderes aplicando entrevistas SMART',unidad:'%',meta:80,actual:'',notas:'',dir:'mayor'},
+  {id:'k10',eje:'DF',nombre:'Colaboradores activos en upskilling / reskilling',unidad:'personas',meta:15,actual:'',notas:'',dir:'mayor'},
+  {id:'k11',eje:'CC',nombre:'Score de pulsos de clima',unidad:'/ 10',meta:7.5,actual:'',notas:'',dir:'mayor'},
+  {id:'k12',eje:'CC',nombre:'Tasa de participación en pulsos de clima',unidad:'%',meta:70,actual:'',notas:'Meta mínima: 70% (ya logrado en encuesta de comunicación)'},
+  {id:'k13',eje:'CC',nombre:'Insignias entregadas por periodo',unidad:'insignias',meta:20,actual:'',notas:'',dir:'mayor'},
+  {id:'k14',eje:'PE',nombre:'% colaboradores con documentación completa',unidad:'%',meta:95,actual:'',notas:'',dir:'mayor'},
+  {id:'k15',eje:'PE',nombre:'Tiempo de respuesta a solicitudes internas de RH',unidad:'días',meta:2,actual:'',notas:'',dir:'menor'},
+  {id:'k16',eje:'PE',nombre:'Avance política de sueldos y salarios (fases)',unidad:'%',meta:100,actual:'',notas:'3 fases: descriptivas, benchmark, política',dir:'mayor'},
 ];
 
 function loadKPIs(){try{const r=localStorage.getItem(KPI_KEY);return r?JSON.parse(r):JSON.parse(JSON.stringify(KPI_SEED));}catch{return JSON.parse(JSON.stringify(KPI_SEED));}}
@@ -2150,109 +1764,7 @@ function kpiBarPct(k){
 
 function barColor(color){return{green:'#4ade80',yellow:'#fad83f',red:'#f87171',gray:'var(--border)'}[color];}
 
-// ── AUTO-KPIs desde datos del tablero ──
-function autoKPIs(){
-  const hoy=new Date();
-  const mesActual=hoy.getMonth();
-  const anioActual=hoy.getFullYear();
-
-  // k1 — Tiempo promedio de cobertura (cubiertas: sol → ingreso)
-  const cubiertas=vacs.filter(v=>v.fechaSolicitud&&v.fechaIngreso&&['cubierta','cubierta-fuera'].includes(v.status));
-  if(cubiertas.length){
-    const tprom=Math.round(cubiertas.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,v.fechaIngreso),0)/cubiertas.length);
-    const k1=kpis.find(k=>k.id==='k1');
-    if(k1){ k1.actual=tprom; k1.auto=true; k1.notas=k1.notas||'Calculado automáticamente desde vacantes cubiertas'; }
-  }
-
-  // k4 — % posiciones clave cubiertas vs plantilla
-  const meta=loadVacMeta();
-  const plantilla=parseFloat(meta.plantilla)||0;
-  if(plantilla>0){
-    const cubiertasN=vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
-    const pct=Math.round(cubiertasN/plantilla*100*10)/10;
-    const k4=kpis.find(k=>k.id==='k4');
-    if(k4){ k4.actual=pct; k4.auto=true; k4.notas=k4.notas||'Calculado automáticamente: '+cubiertasN+' cubiertas / '+plantilla+' plantilla'; }
-  }
-
-  // k16 — Avance política de sueldos (entregables SH completados)
-  if(typeof sh!=='undefined'&&sh&&sh.sh){
-    const totalSH=sh.sh.length;
-    const donoSH=sh.sh.filter(i=>i.status==='entregado'||i.status==='completado').length;
-    if(totalSH>0){
-      const pctSH=Math.round(donoSH/totalSH*100);
-      const k16=kpis.find(k=>k.id==='k16');
-      if(k16){ k16.actual=pctSH; k16.auto=true; k16.notas=k16.notas||'Calculado automáticamente: '+donoSH+' de '+totalSH+' entregables SH completados'; }
-    }
-  }
-
-  // Nota: otros KPIs siguen siendo manuales (retención, NPS, capacitación, etc.)
-}
-
-// ── KPI HISTORIAL ──
-const KPI_HIST_KEY='hostech_kpi_hist_v1';
-function loadKpiHist(){try{return JSON.parse(localStorage.getItem(KPI_HIST_KEY))||{};}catch{return {};}}
-function saveKpiHist(hist){
-  localStorage.setItem(KPI_HIST_KEY,JSON.stringify(hist));
-  syncToSheets('kpi_hist',hist);
-}
-
-function registrarMes(kpiId){
-  const k=kpis.find(x=>x.id===kpiId);
-  if(!k||k.actual==='') { alert('Primero captura el valor actual antes de registrar el mes.'); return; }
-  const hoy=new Date();
-  const mes=hoy.getMonth(); // 0-11
-  const anio=hoy.getFullYear();
-  const hist=loadKpiHist();
-  if(!hist[kpiId]) hist[kpiId]=[];
-  // Reemplazar si ya existe registro de este mes/año
-  const idx=hist[kpiId].findIndex(h=>h.mes===mes&&h.anio===anio);
-  const entry={mes,anio,valor:parseFloat(k.actual),meta:k.meta,dir:k.dir||'mayor'};
-  if(idx>=0) hist[kpiId][idx]=entry; else hist[kpiId].push(entry);
-  saveKpiHist(hist);
-  renderKPIs();
-}
-
-function kpiHistHtml(kpiId, meta, dir, unidad){
-  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const anioActual=new Date().getFullYear();
-  const mesActual=new Date().getMonth();
-  const hist=loadKpiHist();
-  const registros=hist[kpiId]||[];
-  if(!registros.length) return '';
-  const porMes=MESES.map((m,i)=>registros.find(h=>h.mes===i&&h.anio===anioActual)||null);
-  const hayAlguno=porMes.some(r=>r!==null);
-  if(!hayAlguno) return '';
-  const cols=porMes.map((r,i)=>{
-    if(!r){
-      const opacity=i>mesActual?'0.3':'0.5';
-      return `<div style="text-align:center;opacity:${opacity}">
-        <div style="font-size:9px;font-weight:600;color:#8a7f75;margin-bottom:3px">${m}</div>
-        <div style="font-size:11px;color:#c4bbb0">–</div>
-      </div>`;
-    }
-    const pct=r.dir==='menor'?(r.meta/r.valor):(r.valor/r.meta);
-    const dot=pct>=0.9?'#4ade80':pct>=0.7?'#fad83f':'#f87171';
-    const esMes=i===mesActual;
-    return `<div style="text-align:center;background:${esMes?'rgba(255,255,255,0.08)':'transparent'};border-radius:6px;padding:3px 2px">
-      <div style="font-size:9px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:3px">${MESES[i]}</div>
-      <div style="width:6px;height:6px;border-radius:50%;background:${dot};margin:0 auto 3px"></div>
-      <div style="font-size:10px;font-weight:700;color:#fff">${r.valor}</div>
-    </div>`;
-  });
-  return `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1)">
-    <div style="font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:6px">Historial ${anioActual}</div>
-    <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px">${cols.join('')}</div>
-  </div>`;
-}
-
 function renderKPIs(){
-  // Primero inyecta los valores automáticos
-  autoKPIs();
-
-  const MESES_FULL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const mesNombre=MESES_FULL[new Date().getMonth()];
-  const hist=loadKpiHist();
-
   const grupos={AT:[],CA:[],DF:[],CC:[],PE:[]};
   kpis.forEach(k=>{ if(grupos[k.eje]) grupos[k.eje].push(k); });
   Object.entries(grupos).forEach(([eje, list])=>{
@@ -2260,23 +1772,15 @@ function renderKPIs(){
     if(!el)return;
     el.innerHTML=list.map(k=>{
       const s=semaforo(k), bp=kpiBarPct(k), bc=barColor(s.color);
-      const autoTag=k.auto?`<span style="font-size:9px;font-weight:700;letter-spacing:.05em;background:#fad83f;color:#5a4a00;padding:1px 6px;border-radius:4px;margin-left:6px">AUTO</span>`:'';
-      // Buscar formula del seed si no está en el kpi guardado
-      const seedK=KPI_SEED.find(s=>s.id===k.id);
-      const formula=k.formula||(seedK?seedK.formula:'');
-      const mesActual=new Date().getMonth(), anioActual=new Date().getFullYear();
-      const yaRegistrado=(hist[k.id]||[]).some(h=>h.mes===mesActual&&h.anio===anioActual);
-      const histHtml=kpiHistHtml(k.id, k.meta, k.dir||'mayor', k.unidad);
       return `<div class="kpi-card ${s.color}">
         <div class="kpi-eje">${k.eje}</div>
-        <div class="kpi-name">${k.nombre}${autoTag}</div>
-        ${formula?`<div style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:3px;margin-bottom:4px;line-height:1.4">${formula}</div>`:''}
+        <div class="kpi-name">${k.nombre}</div>
         <div class="kpi-semaforo"><span class="sem-dot" style="background:${s.dot}"></span>${s.label}</div>
         <div class="kpi-row">
           <div class="kpi-actual-wrap">
-            <div class="kpi-actual-lbl">Valor actual${k.auto?' · automático':''}</div>
+            <div class="kpi-actual-lbl">Valor actual</div>
             <div style="display:flex;align-items:baseline;gap:4px">
-              <input class="kpi-actual-input" type="number" value="${k.actual}" placeholder="–" onchange="updKPI('${k.id}','actual',this.value);kpis.find(x=>x.id==='${k.id}').auto=false;" style="width:90px${k.auto?';background:#fefce8':''}">
+              <input class="kpi-actual-input" type="number" value="${k.actual}" placeholder="–" onchange="updKPI('${k.id}','actual',this.value)" style="width:90px">
               <span class="kpi-unit">${k.unidad}</span>
             </div>
           </div>
@@ -2286,11 +1790,7 @@ function renderKPIs(){
           </div>
         </div>
         <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${bp}%;background:${bc}"></div></div>
-        <button onclick="registrarMes('${k.id}')" style="font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 12px;border-radius:7px;background:${yaRegistrado?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.15)'};color:${yaRegistrado?'rgba(255,255,255,0.5)':'#fff'};border:1px solid rgba(255,255,255,0.2);cursor:pointer;width:100%;margin-top:8px;font-weight:500">
-          ${yaRegistrado?'✓ '+mesNombre+' registrado':'📌 Registrar '+mesNombre}
-        </button>
-        ${histHtml}
-        <textarea class="kpi-note-input" placeholder="Nota o contexto..." oninput="updKPI('${k.id}','notas',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="resize:none;overflow:hidden;min-height:28px;line-height:1.4;margin-top:8px">${(k.notas||'').replace(/</g,'&lt;')}</textarea>
+        <textarea class="kpi-note-input" placeholder="Nota o contexto..." oninput="updKPI('${k.id}','notas',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="resize:none;overflow:hidden;min-height:28px;line-height:1.4">${(k.notas||'').replace(/</g,'&lt;')}</textarea>
       </div>`;
     }).join('');
   });
@@ -2470,7 +1970,7 @@ function loadSH(){try{const r=localStorage.getItem(SH_KEY);return r?JSON.parse(r
 function saveSH(){localStorage.setItem(SH_KEY,JSON.stringify(sh));const t=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});setSavedLabel('Guardado '+t);syncToSheets('sueldos',sh);}
 let sh=loadSH(), shtimer=null;
 function dshsave(){clearTimeout(shtimer);shtimer=setTimeout(saveSH,600);}
-function updSH(side,id,field,val){const list=sh[side];const item=list.find(x=>x.id===id);if(item){item[field]=val;dshsave();renderSueldos();}}
+function updSH(side,id,field,val){const list=sh[side];const item=list.find(x=>x.id===id);if(item){item[field]=val;dshsave();if(field==='status')renderSueldos();}}
 
 function renderSHTable(side,bodyId,pctId){
   const list=sh[side];
