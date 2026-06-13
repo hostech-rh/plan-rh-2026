@@ -496,22 +496,44 @@ tr:hover td{background:var(--white)}
   <!-- ── EJECUTIVO ── -->
   <div id="tab-ejecutivo">
 
-    <!-- HERO: ARO GRANDE + SUBTÍTULO -->
-    <div style="display:flex;align-items:center;gap:2rem;background:#f6f5ec;border:1px solid #e0d8ce;border-radius:16px;padding:1.75rem 2rem;margin-bottom:16px;cursor:pointer" onclick="goToTareas()" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
-      <svg id="exec-ring" width="150" height="150" viewBox="0 0 150 150" style="flex-shrink:0">
-        <circle cx="75" cy="75" r="62" fill="none" stroke="#e0d8ce" stroke-width="12"/>
-        <circle id="exec-ring-fill" cx="75" cy="75" r="62" fill="none" stroke="#C40E91" stroke-width="12"
-          stroke-dasharray="389.6" stroke-dashoffset="389.6"
-          stroke-linecap="round" transform="rotate(-90 75 75)"/>
-        <text id="exec-ring-txt" x="75" y="79" text-anchor="middle" dominant-baseline="central"
-          font-family="'DM Serif Display',serif" font-size="34" fill="#10100f">0%</text>
-      </svg>
-      <div>
-        <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8a7f75;margin-bottom:6px">Avance general del plan</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1.1;color:#10100f;margin-bottom:8px">Plan de <em style="color:#C40E91;font-style:italic">Recursos Humanos</em></div>
-        <div style="font-size:13px;color:#8a7f75" id="exec-ring-sub">Cargando...</div>
+    <!-- HERO: TITULO + DOS RECUADROS DE AVANCE -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8a7f75;margin-bottom:6px">Avance general del plan</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:30px;line-height:1.1;color:#10100f;margin-bottom:12px">Plan de <em style="color:#C40E91;font-style:italic">Recursos Humanos</em></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="display:flex;align-items:center;gap:14px;background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem 1.25rem;cursor:pointer" onclick="goToTareas()" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+          <svg id="exec-ring" width="100" height="100" viewBox="0 0 100 100" style="flex-shrink:0">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#e0d8ce" stroke-width="10"/>
+            <circle id="exec-ring-fill" cx="50" cy="50" r="42" fill="none" stroke="#C40E91" stroke-width="10"
+              stroke-dasharray="263.9" stroke-dashoffset="263.9"
+              stroke-linecap="round" transform="rotate(-90 50 50)"/>
+            <text id="exec-ring-txt" x="50" y="54" text-anchor="middle" dominant-baseline="central"
+              font-family="'DM Serif Display',serif" font-size="24" fill="#10100f">0%</text>
+          </svg>
+          <div>
+            <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:6px">Avance general del plan</div>
+            <div style="font-size:13px;color:#8a7f75" id="exec-ring-sub">Cargando...</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:14px;background:#e8f5ee;border-radius:12px;padding:1rem 1.25rem">
+          <svg id="exec-ring2" width="100" height="100" viewBox="0 0 100 100" style="flex-shrink:0">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#e0d8ce" stroke-width="10"/>
+            <circle id="exec-ring2-fill" cx="50" cy="50" r="42" fill="none" stroke="#1a6b3a" stroke-width="10"
+              stroke-dasharray="263.9" stroke-dashoffset="263.9"
+              stroke-linecap="round" transform="rotate(-90 50 50)"/>
+            <text id="exec-ring2-txt" x="50" y="54" text-anchor="middle" dominant-baseline="central"
+              font-family="'DM Serif Display',serif" font-size="24" fill="#10100f">0%</text>
+          </svg>
+          <div>
+            <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#10100f;margin-bottom:6px">Avance vs. lo planeado</div>
+            <div style="font-size:13px;color:#8a7f75" id="exec-ring2-sub">Cargando...</div>
+          </div>
+        </div>
       </div>
     </div>
+
 
     <!-- TARJETAS UNIFORMES — plan -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
@@ -1352,15 +1374,27 @@ function showTab(tab,btn){
 function renderEjecutivo(){
   const s=getStats();
   const pct=s.pct;
-  // Ring
-  const circ=389.6;
+  // Ring (radio 42, circunferencia 263.9)
+  const circ=263.9;
   document.getElementById('exec-ring-fill').setAttribute('stroke-dashoffset', circ-(circ*pct/100));
   document.getElementById('exec-ring-txt').textContent=pct+'%';
-  document.getElementById('exec-ring-sub').textContent=s.done+' completas · '+s.init+' iniciadas (×0.5)';
+  document.getElementById('exec-ring-sub').textContent=s.done+' completas · '+s.init+' iniciadas (×0.5) · sobre las '+s.total+' tareas del año';
   document.getElementById('exec-ring-sub').style.color='#8a7f75';
   document.getElementById('exec-done').textContent=s.done;
   document.getElementById('exec-init').textContent=s.init;
   document.getElementById('exec-prog').textContent=s.prog;
+
+  // Aro 2: avance vs. lo planeado (tareas de meses ya transcurridos: ene → mes actual)
+  const mesActualIdx2=new Date().getMonth();
+  const mesesTranscurridos=MES.slice(0,mesActualIdx2+1);
+  const tareasEsperadas=tasks.filter(t=>mesesTranscurridos.includes(t.mes)&&t.status!=='No aplica este año'&&t.status!=='Reprogramada');
+  const doneEsp=tareasEsperadas.filter(t=>t.status==='Completada').length;
+  const initEsp=tareasEsperadas.filter(t=>t.status==='Iniciada').length;
+  const pctEsp=tareasEsperadas.length?Math.round((doneEsp+initEsp*0.5)/tareasEsperadas.length*100):0;
+  document.getElementById('exec-ring2-fill').setAttribute('stroke-dashoffset', circ-(circ*pctEsp/100));
+  document.getElementById('exec-ring2-txt').textContent=pctEsp+'%';
+  document.getElementById('exec-ring2-sub').textContent=`${MES[0]} - ${MES[mesActualIdx2]} 2026 · ${doneEsp+initEsp} de ${tareasEsperadas.length} tareas esperadas`;
+
   // Vacantes activas y cubiertas
   const anioActual=new Date().getFullYear();
 
