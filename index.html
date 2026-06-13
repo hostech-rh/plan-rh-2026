@@ -1479,12 +1479,13 @@ function renderEjecutivo(){
   if(typeof vacs==='undefined'||!vacs.length){
     vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">No hay vacantes registradas</div>';
   } else {
-    const activas=vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status));
+    const vacsV=vacs.filter(v=>(v.puesto||'').trim());
+    const activas=vacsV.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status));
     const urgentes=activas.filter(v=>v.status==='urgente');
     const atrasadas=activas.filter(v=>['atrasada','fuera'].includes(v.status));
     const enTiempo=activas.filter(v=>v.status==='en-tiempo');
-    const porIngresar=vacs.filter(v=>v.status==='por-ingresar');
-    const cubiertas=vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status));
+    const porIngresar=vacsV.filter(v=>v.status==='por-ingresar');
+    const cubiertas=vacsV.filter(v=>['cubierta','cubierta-fuera'].includes(v.status));
     const filas=[
       {label:'Vacantes activas',   n:activas.length,    color:'#4563ff'},
       {label:'Urgentes',           n:urgentes.length,   color:'#e05533'},
@@ -1721,9 +1722,10 @@ function renderVacMetrics(){
   const tpEl=document.getElementById('vac-tprom');
   if(tpEl) tpEl.textContent=tprom?tprom+' días':'–';
 
-  // Conteos vacantes
-  const activas=vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length;
-  const cubiertasN=vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
+  // Conteos vacantes (ignora filas sin puesto)
+  const vacsValidasM=vacs.filter(v=>(v.puesto||'').trim());
+  const activas=vacsValidasM.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length;
+  const cubiertasN=vacsValidasM.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
   const aEl=document.getElementById('vac-activas-n');
   const cEl=document.getElementById('vac-cubiertas-n');
   if(aEl) aEl.textContent=activas;
@@ -2063,12 +2065,13 @@ function renderVacantes(){
   }
   filtroEl.innerHTML=filtroActivoLabel;
 
-  // Summary
-  const total=vacs.length;
-  const activas=vacs.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length;
-  const cubiertas=vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
-  const urgentes=vacs.filter(v=>v.status==='urgente').length;
-  const porIngresar=vacs.filter(v=>v.status==='por-ingresar').length;
+  // Summary (ignora filas sin puesto llenado, ej. agregadas por error)
+  const vacsValidas=vacs.filter(v=>(v.puesto||'').trim());
+  const total=vacsValidas.length;
+  const activas=vacsValidas.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length;
+  const cubiertas=vacsValidas.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
+  const urgentes=vacsValidas.filter(v=>v.status==='urgente').length;
+  const porIngresar=vacsValidas.filter(v=>v.status==='por-ingresar').length;
   document.getElementById('vac-summary').innerHTML=`
     <div class="vac-pill"><span class="pdot" style="background:var(--ink)"></span><strong>${total}</strong> vacantes totales</div>
     <div class="vac-pill"><span class="pdot" style="background:#fad83f"></span><strong>${activas}</strong> activas</div>
