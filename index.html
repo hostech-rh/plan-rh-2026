@@ -752,14 +752,11 @@ tr:hover td{background:var(--white)}
             <th style="width:115px">Fecha selección</th>
             <th style="width:115px">Fecha ingreso</th>
             <th style="width:80px">Sel → Ingreso</th>
-            <th style="min-width:200px">Comentarios</th>
             <th style="width:32px"></th>
           </tr></thead>
           <tbody id="vac-body"></tbody>
         </table>
       </div>
-      <div style="pointer-events:none;position:absolute;top:0;right:0;bottom:0;width:28px;background:linear-gradient(to right,transparent,rgba(246,245,236,.95))"></div>
-      <div style="text-align:center;font-size:11px;color:var(--ink-faint);padding-top:4px">‹ desliza para ver más columnas y comentarios completos ›</div>
     </div>
   </div>
 
@@ -2108,8 +2105,12 @@ function renderVacantes(){
       <td><input class="vac-input" type="date" value="${v.fechaSeleccion||''}" onchange="updVac('${v.id}','fechaSeleccion',this.value)"></td>
       <td><input class="vac-input" type="date" value="${v.fechaIngreso||''}" onchange="updVac('${v.id}','fechaIngreso',this.value)"></td>
       <td style="text-align:center">${selIngresoStr(v)}</td>
-      <td style="min-width:220px"><textarea class="vac-input" placeholder="Comentarios..." oninput="updVac('${v.id}','comentarios',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" onblur="renderVacantes();renderVacMetrics();" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.comentarios||'').replace(/</g,'&lt;')}</textarea></td>
       <td><button class="del-btn" onclick="delVacante('${v.id}')" title="Eliminar">×</button></td>
+    </tr>
+    <tr style="border-bottom:2px solid var(--border)">
+      <td colspan="10" style="padding-top:0;padding-bottom:10px">
+        <textarea class="vac-input" placeholder="Comentarios..." oninput="updVac('${v.id}','comentarios',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.comentarios||'').replace(/</g,'&lt;')}</textarea>
+      </td>
     </tr>`;
   });
   document.getElementById('vac-body').innerHTML=html;
