@@ -739,23 +739,27 @@ tr:hover td{background:var(--white)}
     <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
       <button class="vac-add-btn" onclick="addVacante()">+ Nueva vacante</button>
     </div>
-    <div style="overflow-x:auto">
-      <table class="vac-table">
-        <thead><tr>
-          <th style="min-width:200px">Puesto</th>
-          <th style="min-width:150px">Área</th>
-          <th style="width:110px">Fecha solicitud</th>
-          <th style="width:60px">Días háb.</th>
-          <th style="width:80px">Meta (háb.)</th>
-          <th style="width:130px">Estado</th>
-          <th style="width:115px">Fecha selección</th>
-          <th style="width:115px">Fecha ingreso</th>
-          <th style="width:80px">Sel → Ingreso</th>
-          <th style="min-width:220px">Comentarios</th>
-          <th style="width:32px"></th>
-        </tr></thead>
-        <tbody id="vac-body"></tbody>
-      </table>
+    <div style="position:relative">
+      <div style="overflow-x:auto" id="vac-scroll-wrap">
+        <table class="vac-table">
+          <thead><tr>
+            <th style="min-width:170px">Puesto</th>
+            <th style="min-width:130px">Área</th>
+            <th style="width:110px">Fecha solicitud</th>
+            <th style="width:60px">Días háb.</th>
+            <th style="width:80px">Meta (háb.)</th>
+            <th style="width:130px">Estado</th>
+            <th style="width:115px">Fecha selección</th>
+            <th style="width:115px">Fecha ingreso</th>
+            <th style="width:80px">Sel → Ingreso</th>
+            <th style="min-width:200px">Comentarios</th>
+            <th style="width:32px"></th>
+          </tr></thead>
+          <tbody id="vac-body"></tbody>
+        </table>
+      </div>
+      <div style="pointer-events:none;position:absolute;top:0;right:0;bottom:0;width:28px;background:linear-gradient(to right,transparent,rgba(246,245,236,.95))"></div>
+      <div style="text-align:center;font-size:11px;color:var(--ink-faint);padding-top:4px">‹ desliza para ver más columnas y comentarios completos ›</div>
     </div>
   </div>
 
@@ -2091,7 +2095,7 @@ function renderVacantes(){
     const dias=diasActivosStr(v);
     const dc=typeof dias==='number'?diasColor(dias,v.meta):'transparent';
     html+=`<tr>
-      <td style="min-width:200px"><input id="vi-${v.id}" class="vac-input" type="text" value="${(v.puesto||'').replace(/"/g,'&quot;')}" placeholder="Nombre del puesto" onchange="updVac('${v.id}','puesto',this.value)" style="width:100%"></td>
+      <td style="min-width:170px"><input id="vi-${v.id}" class="vac-input" type="text" value="${(v.puesto||'').replace(/"/g,'&quot;')}" title="${(v.puesto||'').replace(/"/g,'&quot;')}" placeholder="Nombre del puesto" onchange="updVac('${v.id}','puesto',this.value);this.title=this.value" style="width:100%"></td>
       <td style="min-width:150px"><input class="vac-input" type="text" value="${(v.area||'').replace(/"/g,'&quot;')}" placeholder="Área" onchange="updVac('${v.id}','area',this.value)" style="width:100%"></td>
       <td><input class="vac-input" type="date" value="${v.fechaSolicitud||''}" onchange="updVac('${v.id}','fechaSolicitud',this.value)"></td>
       <td><span class="dias-badge" style="background:${dc}">${dias}</span></td>
@@ -2133,7 +2137,7 @@ function loadKPIs(){try{const r=localStorage.getItem(KPI_KEY);return r?JSON.pars
 function saveKPIs(){localStorage.setItem(KPI_KEY,JSON.stringify(kpis));const t=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});setSavedLabel('Guardado '+t);syncToSheets('kpis',kpis);}
 let kpis=loadKPIs(), ktimer=null;
 function dksave(){clearTimeout(ktimer);ktimer=setTimeout(saveKPIs,600);}
-function updKPI(id,field,val){const k=kpis.find(x=>x.id===id);if(k){k[field]=val;dksave();renderKPIs();}}
+function updKPI(id,field,val){const k=kpis.find(x=>x.id===id);if(k){k[field]=val;dksave();if(field!=='notas')renderKPIs();}}
 
 function semaforo(k){
   const v=parseFloat(k.actual);
@@ -2350,7 +2354,7 @@ function loadHBL(){
 function saveHBL(){localStorage.setItem(HBL_KEY,JSON.stringify(hbl));const t=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});setSavedLabel('Guardado '+t);syncToSheets('hellena',hbl);}
 let hbl=loadHBL(), hbltimer=null;
 function dhblsave(){clearTimeout(hbltimer);hbltimer=setTimeout(saveHBL,600);}
-function updHBL(side,id,field,val){const list=hbl[side];const item=list.find(x=>x.id===id);if(item){item[field]=val;dhblsave();renderHellena();}}
+function updHBL(side,id,field,val){const list=hbl[side];const item=list.find(x=>x.id===id);if(item){item[field]=val;dhblsave();if(field==='status')renderHellena();}}
 
 function hblStsCls(v){return HBL_STATUS.find(s=>s.val===v)?.cls||'cs-pend';}
 function hblStsLabel(v){return HBL_STATUS.find(s=>s.val===v)?.label||'Pendiente';}
