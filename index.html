@@ -1295,13 +1295,18 @@ function renderEjecutivo(){
 
   const meta=loadVacMeta?loadVacMeta():{plantilla:''};
   const plantilla=parseFloat(meta.plantilla)||0;
-  const numBajas=(typeof bajas!=='undefined')?bajas.length:0;
+  const now_=new Date();
+  const numBajas=(typeof bajas!=='undefined')?bajas.filter(b=>{
+    if(!b.fecha)return false;
+    const d=new Date(b.fecha+'T12:00:00');
+    return d.getFullYear()===now_.getFullYear()&&d.getMonth()===now_.getMonth();
+  }).length:0;
   const rotEl=document.getElementById('exec-rotacion');
   if(rotEl) rotEl.textContent=plantilla>0?(numBajas/plantilla*100).toFixed(1)+'%':'–';
 
   // Heatmap
   const MES_SHORT=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const NOW_IDX=4; // Mayo
+  const NOW_IDX=new Date().getMonth(); // mes actual
   let heatHtml='';
   MES.forEach((m,i)=>{
     const all=tasks.filter(t=>t.mes===m);
@@ -1505,8 +1510,13 @@ function renderVacMetrics(){
   const pEl=document.getElementById('vac-plantilla');
   if(pEl&&!pEl.value) pEl.value=meta.plantilla;
 
-  // Conteo de bajas desde el registro
-  const numBajas=bajas.length;
+  // Conteo de bajas del mes actual desde el registro
+  const now=new Date();
+  const numBajas=bajas.filter(b=>{
+    if(!b.fecha)return false;
+    const d=new Date(b.fecha+'T12:00:00');
+    return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();
+  }).length;
   const bajasNEl=document.getElementById('vac-bajas-n');
   if(bajasNEl) bajasNEl.textContent=numBajas;
 
