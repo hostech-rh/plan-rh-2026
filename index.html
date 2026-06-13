@@ -2095,8 +2095,8 @@ function renderVacantes(){
     const dias=diasActivosStr(v);
     const dc=typeof dias==='number'?diasColor(dias,v.meta):'transparent';
     html+=`<tr>
-      <td style="min-width:170px"><input id="vi-${v.id}" class="vac-input" type="text" value="${(v.puesto||'').replace(/"/g,'&quot;')}" title="${(v.puesto||'').replace(/"/g,'&quot;')}" placeholder="Nombre del puesto" onchange="updVac('${v.id}','puesto',this.value);this.title=this.value" style="width:100%"></td>
-      <td style="min-width:150px"><input class="vac-input" type="text" value="${(v.area||'').replace(/"/g,'&quot;')}" placeholder="Área" onchange="updVac('${v.id}','area',this.value)" style="width:100%"></td>
+      <td style="min-width:170px"><textarea id="vi-${v.id}" class="vac-input" placeholder="Nombre del puesto" oninput="updVac('${v.id}','puesto',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.puesto||'').replace(/</g,'&lt;')}</textarea></td>
+      <td style="min-width:150px"><textarea class="vac-input" placeholder="Área" oninput="updVac('${v.id}','area',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.area||'').replace(/</g,'&lt;')}</textarea></td>
       <td><input class="vac-input" type="date" value="${v.fechaSolicitud||''}" onchange="updVac('${v.id}','fechaSolicitud',this.value)"></td>
       <td><span class="dias-badge" style="background:${dc}">${dias}</span></td>
       <td><input class="vac-input" type="number" value="${v.meta||30}" min="1" style="width:60px" onchange="updVac('${v.id}','meta',parseInt(this.value)||30)"></td>
