@@ -662,9 +662,13 @@ tr:hover td{background:var(--white)}
         <div style="font-size:11px;color:#8a7f75">colaboradores · dato manual</div>
       </div>
       <!-- Bajas del mes - expandible -->
-      <div id="vac-bajas-card" onclick="toggleBajas(event)" style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:border-color .2s" onmouseover="this.style.borderColor='#C40E91'" onmouseout="this.style.borderColor='#e0d8ce'">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75">Bajas del mes</div>
-        <div style="display:flex;align-items:baseline;gap:8px">
+      <div id="vac-bajas-card" style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px;transition:border-color .2s">
+        <div style="display:flex;align-items:center;gap:6px">
+          <button onclick="cambiarMesBajasCard(-1)" title="Mes anterior" style="background:none;border:none;cursor:pointer;color:#C40E91;font-size:14px;line-height:1;padding:1px 4px;border-radius:4px" onmouseover="this.style.background='#fbe0ee'" onmouseout="this.style.background='none'">‹</button>
+          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75">Bajas del mes</div>
+          <button onclick="cambiarMesBajasCard(1)" title="Mes siguiente" style="background:none;border:none;cursor:pointer;color:#C40E91;font-size:14px;line-height:1;padding:1px 4px;border-radius:4px" onmouseover="this.style.background='#fbe0ee'" onmouseout="this.style.background='none'">›</button>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;cursor:pointer" onclick="toggleBajas(event)">
           <div style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#10100f" id="vac-bajas-n">0</div>
           <span style="font-size:12px;color:#C40E91;font-weight:500" id="vac-bajas-chevron">▾ ver detalle</span>
         </div>
@@ -1554,7 +1558,8 @@ function renderEjecutivo(){
 }
 
 // Filtros activos de mes en pestaña vacantes
-let filtroBajasMes=null;   // null = todos, 0-11 = mes específico
+let filtroBajasMes=null;   // null = todos, 0-11 = mes específico (usado en tabla expandible)
+let mesBajasCardSel=null;  // null = mes actual; 0-11 = mes seleccionado en tarjeta "Bajas del mes"
 let filtroVacSolMes=null;
 let filtroVacCubMes=null;
 let mesEsperadoSel=null; // null = mes actual; si no, índice 0-11 seleccionado manualmente
@@ -1633,6 +1638,20 @@ function saveBajas(){
   renderVacMetrics();
 }
 
+function cambiarMesBajasCard(delta){
+  const base=mesBajasCardSel!==null?mesBajasCardSel:new Date().getMonth();
+  let next=base+delta;
+  if(next<0)next=0;
+  if(next>11)next=11;
+  mesBajasCardSel=next;
+  // Si el detalle está abierto, sincronizar el filtro de la tabla con el mismo mes
+  const panel=document.getElementById('bajas-panel');
+  if(panel&&panel.style.display!=='none'){
+    filtroBajasMes=next;
+    renderBajas();
+  }
+  renderVacMetrics();
+}
 function toggleBajas(e){
   if(e) e.stopPropagation();
   const panel=document.getElementById('bajas-panel');
@@ -1649,7 +1668,7 @@ function toggleBajas(e){
     panel.style.display='block';
     chevron.textContent='▴ cerrar';
     card.style.borderColor='#C40E91';
-    filtroBajasMes=null;
+    filtroBajasMes=mesBajasCardSel;
     // Pequeño delay para asegurar que el DOM esté visible antes de renderizar
     setTimeout(()=>renderBajas(), 30);
   }
@@ -1737,7 +1756,7 @@ function renderVacMetrics(){
 
   // Conteo de bajas del MES ACTUAL desde el registro
   const hoy=new Date();
-  const mesActual=hoy.getMonth();
+  const mesActual=mesBajasCardSel!==null?mesBajasCardSel:hoy.getMonth();
   const anioActual=hoy.getFullYear();
   const bajasMes=bajas.filter(b=>{
     if(!b.fecha)return false;
@@ -1752,7 +1771,7 @@ function renderVacMetrics(){
   const bajasSubEl=document.getElementById('vac-bajas-sub');
   if(bajasSubEl) bajasSubEl.textContent=MESES_SHORT[mesActual]+' · dato manual · Supercompany';
 
-  // Rotación calculada con plantilla del mes actual (snapshot)
+  // Rotación calculada con plantilla del mes seleccionado (snapshot)
   const plantillaMesActual=getPlantillaParaMes(mesActual, anioActual);
   const rotEl=document.getElementById('vac-rotacion');
   if(rotEl) rotEl.textContent=plantillaMesActual>0?(numBajas/plantillaMesActual*100).toFixed(1)+'%':'–';
