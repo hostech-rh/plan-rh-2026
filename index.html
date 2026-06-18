@@ -673,6 +673,7 @@ tr:hover td{background:var(--white)}
           <span style="font-size:12px;color:#C40E91;font-weight:500" id="vac-bajas-chevron">▾ ver detalle</span>
         </div>
         <div style="font-size:11px;color:#8a7f75" id="vac-bajas-sub">dato manual · Supercompany</div>
+        <div id="vac-plantilla-hist-wrap" style="display:flex;align-items:center;gap:6px;margin-top:2px"></div>
       </div>
       <!-- Rotación calculada -->
       <div style="background:#fad83f;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:6px">
@@ -1604,6 +1605,18 @@ function getPlantillaParaMes(mes, anio){
   return sorted[0].plantilla;
 }
 
+function savePlantillaHist(mes,anio){
+  const input=document.getElementById('vac-plantilla-hist-input');
+  const val=parseFloat(input.value);
+  if(isNaN(val)||val<0){alert('Ingresa un número válido de plantilla');return;}
+  const snaps=loadPlantillaSnaps();
+  const idx=snaps.findIndex(s=>s.mes===mes&&s.anio===anio);
+  const snap={mes,anio,plantilla:val};
+  if(idx>=0) snaps[idx]=snap; else snaps.push(snap);
+  localStorage.setItem(PLANTILLA_SNAP_KEY,JSON.stringify(snaps));
+  syncToSheets('plantilla_snaps',snaps);
+  renderVacMetrics();
+}
 function saveVacMeta(){
   const val=document.getElementById('vac-plantilla').value;
   const meta={plantilla:val};
@@ -1775,6 +1788,18 @@ function renderVacMetrics(){
   const plantillaMesActual=getPlantillaParaMes(mesActual, anioActual);
   const rotEl=document.getElementById('vac-rotacion');
   if(rotEl) rotEl.textContent=plantillaMesActual>0?(numBajas/plantillaMesActual*100).toFixed(1)+'%':'–';
+
+  // Campo de plantilla histórica para el mes seleccionado (permite fijar/corregir el cierre de ese mes)
+  const histWrap=document.getElementById('vac-plantilla-hist-wrap');
+  if(histWrap){
+    const snapsExist=loadPlantillaSnaps();
+    const tieneSnapPropio=snapsExist.some(s=>s.mes===mesActual&&s.anio===anioActual);
+    histWrap.innerHTML=`
+      <span style="font-size:11px;color:#8a7f75">Plantilla ${MESES_SHORT[mesActual]}:</span>
+      <input type="number" id="vac-plantilla-hist-input" value="${plantillaMesActual||''}" placeholder="—" style="width:54px;border:1px solid ${tieneSnapPropio?'#d8cfc3':'#e8a8c8'};border-radius:6px;padding:2px 6px;font-size:12px;background:${tieneSnapPropio?'#fff':'#fef0f7'}">
+      <button onclick="savePlantillaHist(${mesActual},${anioActual})" style="font-size:11px;color:#C40E91;background:none;border:none;cursor:pointer;font-weight:500">guardar</button>
+      ${!tieneSnapPropio?'<span style="font-size:10px;color:#b07a92">(estimado, sin cierre registrado)</span>':''}`;
+  }
 
   // Tiempo promedio vacantes ACTIVAS (días sin cubrir hasta hoy)
   const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&!['cubierta','cubierta-fuera'].includes(v.status));
