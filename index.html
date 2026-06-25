@@ -170,6 +170,7 @@ tr:hover td{background:var(--white)}
 .vs-urgente{background:#fde8e8;color:#8b1a1a;border-color:#f0a0a0}
 .vs-cubierta{background:var(--blue-soft);color:var(--blue);border-color:#a0b4ff}
 .vs-cubierta-fuera{background:#ede8ff;color:#4a28c4;border-color:#b8a8f0}
+.vs-pausada{background:#f5f0e0;color:#7a6a2a;border-color:#d4c070}
 .vs-por-ingresar{background:var(--cream);color:var(--ink-muted);border-color:var(--border)}
 .dias-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}
 .del-btn{background:none;border:none;cursor:pointer;color:var(--ink-faint);font-size:16px;padding:2px 6px;border-radius:4px;line-height:1}
@@ -781,6 +782,7 @@ tr:hover td{background:var(--white)}
             <th style="width:80px">Meta (háb.)</th>
             <th style="width:130px">Estado</th>
             <th style="width:115px">Fecha selección</th>
+            <th style="width:115px">Fecha pausa</th>
             <th style="width:115px">Fecha ingreso</th>
             <th style="width:80px">Sel → Ingreso</th>
             <th style="width:32px"></th>
@@ -1531,7 +1533,7 @@ function renderEjecutivo(){
     vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">No hay vacantes registradas</div>';
   } else {
     const vacsV=vacs.filter(v=>(v.puesto||'').trim());
-    const activas=vacsV.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status));
+    const activas=vacsV.filter(v=>!['cubierta','cubierta-fuera','pausada'].includes(v.status));
     const urgentes=activas.filter(v=>v.status==='urgente');
     const atrasadas=activas.filter(v=>['atrasada','fuera'].includes(v.status));
     const enTiempo=activas.filter(v=>v.status==='en-tiempo');
@@ -1580,6 +1582,7 @@ const STATUS_VAC=[
   {val:'cubierta',    label:'Cubierta',             cls:'vs-cubierta'},
   {val:'cubierta-fuera',label:'Cubierta f/tiempo',  cls:'vs-cubierta-fuera'},
   {val:'por-ingresar',label:'Por ingresar',         cls:'vs-por-ingresar'},
+  {val:'pausada',     label:'Pausada',               cls:'vs-pausada'},
 ];
 // ── VACANTES META (plantilla + snapshots históricos) ──
 const VAC_META_KEY='hostech_vac_meta_v1';
@@ -1802,7 +1805,7 @@ function renderVacMetrics(){
   }
 
   // Tiempo promedio vacantes ACTIVAS (días sin cubrir hasta hoy)
-  const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&!['cubierta','cubierta-fuera'].includes(v.status));
+  const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&!['cubierta','cubierta-fuera','pausada'].includes(v.status));
   const tpromActivas=actvasConFecha.length?Math.round(actvasConFecha.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,new Date().toISOString().slice(0,10)),0)/actvasConFecha.length):null;
   const tpaEl=document.getElementById('vac-tprom-activas');
   if(tpaEl) tpaEl.textContent=tpromActivas?tpromActivas+' días':'–';
@@ -1815,7 +1818,7 @@ function renderVacMetrics(){
 
   // Conteos vacantes (ignora filas sin puesto)
   const vacsValidasM=vacs.filter(v=>(v.puesto||'').trim());
-  const activas=vacsValidasM.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length;
+  const activas=vacsValidasM.filter(v=>!['cubierta','cubierta-fuera','pausada'].includes(v.status)).length;
   const cubiertasN=vacsValidasM.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
   const aEl=document.getElementById('vac-activas-n');
   const cEl=document.getElementById('vac-cubiertas-n');
@@ -2072,8 +2075,11 @@ function diasActivosStr(v){
   if(!v.fechaSolicitud)return'–';
   const hoy=new Date().toISOString().slice(0,10);
   let end;
-  if(['cubierta','cubierta-fuera'].includes(v.status)&&v.fechaSeleccion&&v.fechaSeleccion<=hoy){
-    // Vacante cerrada → contar hasta fecha selección (fin del proceso de reclutamiento)
+  if(v.status==='pausada'&&v.fechaPausa&&v.fechaPausa<=hoy){
+    // Vacante pausada → congelar en fecha de pausa
+    end=v.fechaPausa;
+  } else if(['cubierta','cubierta-fuera'].includes(v.status)&&v.fechaSeleccion&&v.fechaSeleccion<=hoy){
+    // Vacante cerrada → contar hasta fecha selección
     end=v.fechaSeleccion;
   } else if(v.fechaSeleccion&&v.fechaSeleccion<=hoy){
     // Candidato seleccionado pero aún no ingresa → congelar en fecha selección
@@ -2157,7 +2163,7 @@ function renderVacantes(){
   // Summary (ignora filas sin puesto llenado, ej. agregadas por error)
   const vacsValidas=vacs.filter(v=>(v.puesto||'').trim());
   const total=vacsValidas.length;
-  const activas=vacsValidas.filter(v=>!['cubierta','cubierta-fuera'].includes(v.status)).length;
+  const activas=vacsValidas.filter(v=>!['cubierta','cubierta-fuera','pausada'].includes(v.status)).length;
   const cubiertas=vacsValidas.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
   const urgentes=vacsValidas.filter(v=>v.status==='urgente').length;
   const porIngresar=vacsValidas.filter(v=>v.status==='por-ingresar').length;
@@ -2173,7 +2179,7 @@ function renderVacantes(){
   const statusOpts=STATUS_VAC.map(s=>`<option value="${s.val}">${s.label}</option>`).join('');
   let html='';
   if(!listaVacs.length){
-    html=`<tr><td colspan="10" style="padding:2rem;text-align:center;color:var(--ink-muted)">${filtroVacSolMes!==null||filtroVacCubMes!==null?'Sin vacantes en ese mes':'No hay vacantes registradas · haz clic en "+ Nueva vacante" para empezar'}</td></tr>`;
+    html=`<tr><td colspan="11" style="padding:2rem;text-align:center;color:var(--ink-muted)">${filtroVacSolMes!==null||filtroVacCubMes!==null?'Sin vacantes en ese mes':'No hay vacantes registradas · haz clic en "+ Nueva vacante" para empezar'}</td></tr>`;
   }
   listaVacs.forEach(v=>{
     const sv=STATUS_VAC.find(s=>s.val===v.status)||STATUS_VAC[0];
@@ -2191,12 +2197,13 @@ function renderVacantes(){
         </select>
       </td>
       <td><input class="vac-input" type="date" value="${v.fechaSeleccion||''}" onchange="updVac('${v.id}','fechaSeleccion',this.value)"></td>
+      <td style="opacity:${v.status==='pausada'?'1':'0.35'}"><input class="vac-input" type="date" value="${v.fechaPausa||''}" onchange="updVac('${v.id}','fechaPausa',this.value)" title="Fecha en que se pausó la vacante" ${v.status!=='pausada'?'tabindex="-1"':''}></td>
       <td><input class="vac-input" type="date" value="${v.fechaIngreso||''}" onchange="updVac('${v.id}','fechaIngreso',this.value)"></td>
       <td style="text-align:center">${selIngresoStr(v)}</td>
       <td><button class="del-btn" onclick="delVacante('${v.id}')" title="Eliminar">×</button></td>
     </tr>
     <tr style="border-bottom:2px solid var(--border)">
-      <td colspan="10" style="padding-top:0;padding-bottom:10px">
+      <td colspan="11" style="padding-top:0;padding-bottom:10px">
         <textarea class="vac-input" placeholder="Comentarios..." oninput="updVac('${v.id}','comentarios',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.comentarios||'').replace(/</g,'&lt;')}</textarea>
       </td>
     </tr>`;
