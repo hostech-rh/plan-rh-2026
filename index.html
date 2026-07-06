@@ -438,6 +438,8 @@ tr:hover td{background:var(--white)}
       </select>
       <input class="fs" id="fQ" placeholder="Buscar tarea o responsable..." oninput="render()">
       <button onclick="addTarea()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">+ Nueva tarea</button>
+      <button onclick="mesesCollapsed=new Set();render()" title="Expandir todos los meses" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--ink-faint);color:var(--white);border:none;cursor:pointer" onmouseover="this.style.background='#888'" onmouseout="this.style.background='var(--ink-faint)'">▾ Todo</button>
+      <button onclick="mesesCollapsed=new Set(MES);render()" title="Colapsar todos los meses" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--ink-faint);color:var(--white);border:none;cursor:pointer" onmouseover="this.style.background='#888'" onmouseout="this.style.background='var(--ink-faint)'">▸ Todo</button>
     </div>
     <div class="twrap">
       <table>
@@ -1186,6 +1188,15 @@ function renderMeta(){
   `;
 }
 function scls(v){return{'Completada':'sDone','Iniciada':'sInit','En progreso':'sProg','Bloqueada':'sBlok','Sin iniciar':'sPend','No aplica este año':'sNa','Reprogramada':'sRepr'}[v]||'sPend';}
+// Meses colapsados en la pestaña de Tareas (Set de nombres de mes)
+let mesesCollapsed=new Set();
+
+function toggleMesCollapse(mes){
+  if(mesesCollapsed.has(mes)) mesesCollapsed.delete(mes);
+  else mesesCollapsed.add(mes);
+  render();
+}
+
 function render(){
   const fM=document.getElementById('fMes').value,fE=document.getElementById('fEje').value,
     fS=document.getElementById('fSt').value,fQ=document.getElementById('fQ').value.toLowerCase();
@@ -1199,9 +1210,16 @@ function render(){
   let h='';
   MES.forEach(m=>{
     if(!g[m])return;
-    h+=`<tr class="mhdr"><td colspan="6">${m} · ${g[m].length} tarea${g[m].length>1?'s':''}</td></tr>`;
-    g[m].forEach(t=>{
-      const sc=ESHORT[t.eje]||'',stc=scls(t.status);
+    const collapsed=mesesCollapsed.has(m);
+    const done=g[m].filter(t=>t.status==='Completada').length;
+    const pct=g[m].length?Math.round(done/g[m].length*100):0;
+    h+=`<tr class="mhdr" onclick="toggleMesCollapse('${m}')" style="cursor:pointer;user-select:none">
+      <td colspan="6">
+        <span style="font-size:13px;margin-right:6px">${collapsed?'▸':'▾'}</span>${m} · ${g[m].length} tarea${g[m].length>1?'s':''} · ${pct}% completado
+      </td></tr>`;
+    if(!collapsed){
+      g[m].forEach(t=>{
+        const sc=ESHORT[t.eje]||'',stc=scls(t.status);
       h+=`<tr>
         <td style="color:var(--ink-muted);font-size:12px;white-space:nowrap">
           ${t.mes}
@@ -1232,8 +1250,9 @@ function render(){
         <td style="min-width:160px"><textarea class="ni" placeholder="Agregar nota..." oninput="upd(${t.id},'notas',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" onblur="render()" style="width:100%;resize:none;overflow:hidden;min-height:28px;line-height:1.4">${(t.notas||'').replace(/</g,'&lt;')}</textarea></td>
         <td><button onclick="delTarea(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--ink-faint);font-size:15px;padding:2px 4px;border-radius:4px" title="Eliminar">×</button></td>
       </tr>`;
-    });
-  });
+      }); // fin forEach tareas del mes
+    }   // fin if(!collapsed)
+  });   // fin MES.forEach
   document.getElementById('tbody').innerHTML=h||'<tr><td colspan="6" style="padding:2rem;text-align:center;color:var(--ink-muted)">Sin resultados</td></tr>';
   renderMeta();
 }
@@ -1380,7 +1399,12 @@ function showTab(tab,btn){
   document.getElementById('tab-hellena').style.display=tab==='hellena'?'':'none';
   document.getElementById('tab-sueldos').style.display=tab==='sueldos'?'':'none';
   document.getElementById('tab-comite').style.display=tab==='comite'?'':'none';
-  if(tab==='dashboard')renderDash();
+  if(tab==='tareas'){
+    // Colapsar todos los meses excepto el mes actual al abrir la pestaña
+    const mesActualNombre=MES[new Date().getMonth()];
+    mesesCollapsed=new Set(MES.filter(m=>m!==mesActualNombre));
+    render();
+  }
   if(tab==='kpis')renderKPIs();
   if(tab==='vacantes'){renderVacantes();renderVacMetrics();}
   if(tab==='ejecutivo')renderEjecutivo();
