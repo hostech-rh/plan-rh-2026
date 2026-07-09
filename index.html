@@ -1405,6 +1405,7 @@ function showTab(tab,btn){
     mesesCollapsed=new Set(MES.filter(m=>m!==mesActualNombre));
     render();
   }
+  if(tab==='dashboard')renderDash();
   if(tab==='kpis')renderKPIs();
   if(tab==='vacantes'){renderVacantes();renderVacMetrics();}
   if(tab==='ejecutivo')renderEjecutivo();
@@ -2403,7 +2404,7 @@ function renderKPIs(){
           <div class="kpi-actual-wrap">
             <div class="kpi-actual-lbl">Valor actual${k.auto?' · automático':''}</div>
             <div style="display:flex;align-items:baseline;gap:4px">
-              <input class="kpi-actual-input" type="number" value="${k.actual}" placeholder="–" onchange="updKPI('${k.id}','actual',this.value);kpis.find(x=>x.id==='${k.id}').auto=false;" style="width:90px${k.auto?';background:#fefce8':''}">
+              <input class="kpi-actual-input" type="number" value="${k.actual}" placeholder="–" onblur="updKPI('${k.id}','actual',this.value);kpis.find(x=>x.id==='${k.id}').auto=false;" style="width:90px${k.auto?';background:#fefce8':''}">
               <span class="kpi-unit">${k.unidad}</span>
             </div>
           </div>
