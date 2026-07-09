@@ -2309,7 +2309,8 @@ function autoKPIs(){
     if(totalSH>0){
       const pctSH=Math.round(donoSH/totalSH*100);
       const k16=kpis.find(k=>k.id==='k16');
-      if(k16){ k16.actual=pctSH; k16.auto=true; k16.notas=k16.notas||'Calculado automáticamente: '+donoSH+' de '+totalSH+' entregables SH completados'; }
+      // Solo sobreescribir si el usuario no lo ha editado manualmente (auto !== false)
+      if(k16&&k16.auto!==false){ k16.actual=pctSH; k16.auto=true; k16.notas=k16.notas||'Calculado automáticamente: '+donoSH+' de '+totalSH+' entregables SH completados'; }
     }
   }
 
@@ -2404,7 +2405,7 @@ function renderKPIs(){
           <div class="kpi-actual-wrap">
             <div class="kpi-actual-lbl">Valor actual${k.auto?' · automático':''}</div>
             <div style="display:flex;align-items:baseline;gap:4px">
-              <input class="kpi-actual-input" type="number" value="${k.actual}" placeholder="–" onblur="updKPI('${k.id}','actual',this.value);kpis.find(x=>x.id==='${k.id}').auto=false;" style="width:90px${k.auto?';background:#fefce8':''}">
+              <input class="kpi-actual-input" type="number" value="${k.actual}" placeholder="–" onblur="const _k=kpis.find(x=>x.id==='${k.id}');if(_k){_k.auto=false;updKPI('${k.id}','actual',this.value);}" style="width:90px${k.auto?';background:#fefce8':''}">
               <span class="kpi-unit">${k.unidad}</span>
             </div>
           </div>
