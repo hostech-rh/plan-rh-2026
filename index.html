@@ -1446,6 +1446,7 @@ function showTab(tab,btn){
 }
 
 function renderEjecutivo(){
+  if(typeof vacs!=='undefined') refreshVacStatuses();
   const s=getStats();
   const pct=s.pct;
   // Ring (radio 42, circunferencia 263.9)
@@ -2114,7 +2115,7 @@ function autoStatus(v){
   // Si ya tiene fecha ingreso → cubierta o cubierta f/tiempo
   if(v.fechaIngreso){
     const dias=daysBetween(v.fechaSolicitud, v.fechaIngreso);
-    v.status = dias <= (v.meta||30) ? 'cubierta' : 'cubierta-fuera';
+    v.status = dias <= (v.meta||20) ? 'cubierta' : 'cubierta-fuera';
     return;
   }
   // Si tiene fecha selección pero no ingreso → por ingresar (semáforo basado en sol→sel)
@@ -2194,6 +2195,20 @@ function diasColor(dias,meta){
   return'#fde8e8';
 }
 
+// Recalcula el estado (semáforo) de todas las vacantes abiertas contra la fecha de hoy.
+// Se llama en cada render para que el color del badge de días y el semáforo NUNCA queden desincronizados.
+// Las vacantes "pausada" se excluyen porque su estado es una decisión manual (freeze), no automática.
+function refreshVacStatuses(){
+  let changed=false;
+  vacs.forEach(v=>{
+    if(v.status==='pausada') return;
+    const prev=v.status;
+    autoStatus(v);
+    if(v.status!==prev) changed=true;
+  });
+  if(changed) dvsave();
+}
+
 function addVacante(){
   const id='v'+Date.now();
   vacs.push({id,puesto:'',area:'',fechaSolicitud:'',meta:20,status:'en-tiempo',fechaSeleccion:'',fechaIngreso:''});
@@ -2211,6 +2226,7 @@ function delVacante(id){
 }
 
 function renderVacantes(){
+  refreshVacStatuses();
   const MESES_LABEL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const anioActual=new Date().getFullYear();
 
@@ -2294,7 +2310,7 @@ function renderVacantes(){
             <td style="min-width:150px"><textarea class="vac-input" placeholder="Área" oninput="updVac('${v.id}','area',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.area||'').replace(/</g,'&lt;')}</textarea></td>
             <td><input class="vac-input" type="date" value="${v.fechaSolicitud||''}" onchange="updVac('${v.id}','fechaSolicitud',this.value)"></td>
             <td><span class="dias-badge" style="background:${dc}">${dias}</span></td>
-            <td><input class="vac-input" type="number" value="${v.meta||30}" min="1" style="width:60px" onchange="updVac('${v.id}','meta',parseInt(this.value)||30)"></td>
+            <td><input class="vac-input" type="number" value="${v.meta||20}" min="1" style="width:60px" onchange="updVac('${v.id}','meta',parseInt(this.value)||20)"></td>
             <td>
               <select class="vac-input" style="min-width:130px" onchange="updVac('${v.id}','status',this.value)">
                 ${STATUS_VAC.map(s=>`<option value="${s.val}" ${v.status===s.val?'selected':''}>${s.label}</option>`).join('')}
