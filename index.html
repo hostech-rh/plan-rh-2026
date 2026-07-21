@@ -79,6 +79,12 @@ th{text-align:left;padding:9px 12px;font-size:11px;font-weight:600;letter-spacin
 td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--ink-soft)}
 tr:hover td{background:var(--white)}
 .mhdr td{background:var(--ink);color:var(--cream);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px}
+.mhdr-mes td{background:var(--cream);color:var(--ink-soft);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 12px;border-bottom:2px solid var(--ink)}
+.mhdr-block td{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 12px}
+.mhdr-abiertas td{background:#fef8d0;color:#8a6800;border-bottom:2px solid #f0c840}
+.mhdr-poringresar td{background:#d6edf9;color:#1a5e8a;border-bottom:2px solid #7ac4e8}
+.mhdr-cubiertas td{background:#d4f5e0;color:#1a6b3a;border-bottom:2px solid #7dd6a0}
+.mhdr-pausadas td{background:#f5f0e0;color:#7a6a2a;border-bottom:2px solid #d4c070}
 
 /* EJE BADGES */
 .eb{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:.04em}
@@ -1236,7 +1242,7 @@ function render(){
     const collapsed=mesesCollapsed.has(m);
     const done=g[m].filter(t=>t.status==='Completada').length;
     const pct=g[m].length?Math.round(done/g[m].length*100):0;
-    h+=`<tr class="mhdr" onclick="toggleMesCollapse('${m}')" style="cursor:pointer;user-select:none">
+    h+=`<tr class="mhdr-mes" onclick="toggleMesCollapse('${m}')" style="cursor:pointer;user-select:none">
       <td colspan="6">
         <span style="font-size:13px;margin-right:6px">${collapsed?'▸':'▾'}</span>${m} · ${g[m].length} tarea${g[m].length>1?'s':''} · ${pct}% completado
       </td></tr>`;
@@ -2274,7 +2280,8 @@ function renderVacantes(){
         rows.forEach(v=>{cont[v.status]=(cont[v.status]||0)+1;});
         semHtml=Object.entries(SEM_COLORS).map(([st,color])=>cont[st]?`<span style="color:${color};font-weight:700;margin-left:12px">● ${cont[st]}</span>`:'').join('');
       }
-      html+=`<tr class="mhdr" onclick="toggleVacBloque('${b.key}')" style="cursor:pointer;user-select:none">
+      const blockClass={'abiertas':'mhdr-abiertas','por-ingresar':'mhdr-poringresar','cubiertas':'mhdr-cubiertas','pausadas':'mhdr-pausadas'}[b.key]||'mhdr-mes';
+      html+=`<tr class="mhdr-block ${blockClass}" onclick="toggleVacBloque('${b.key}')" style="cursor:pointer;user-select:none">
         <td colspan="11">
           <span style="font-size:13px;margin-right:6px">${collapsed?'▸':'▾'}</span>${b.label} · ${rows.length}${semHtml}
         </td></tr>`;
