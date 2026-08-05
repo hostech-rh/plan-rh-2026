@@ -398,13 +398,12 @@ tr:hover td{background:var(--white)}
   <div class="nav-in">
     <button class="ntab active" onclick="showTab('ejecutivo',this)">Ejecutivo</button>
     <button class="ntab" onclick="showTab('tareas',this)">Tareas</button>
-    <button class="ntab" onclick="showTab('dashboard',this)">Dashboard</button>
-    <button class="ntab" onclick="showTab('kpis',this)">KPIs</button>
     <button class="ntab" onclick="showTab('vacantes',this)">Vacantes</button>
     <button class="ntab" onclick="showTab('bajas',this)">Bajas</button>
     <button class="ntab" onclick="showTab('hellena',this)">Hellena</button>
     <button class="ntab" onclick="showTab('sueldos',this)">Sueldos y Salarios</button>
     <button class="ntab" onclick="showTab('comite',this)">Comité</button>
+    <button class="ntab" onclick="showTab('kpis',this)">KPIs</button>
   </div>
 </nav>
 
@@ -466,19 +465,6 @@ tr:hover td{background:var(--white)}
     </div>
   </div>
 
-  <div id="tab-dashboard" style="display:none">
-    <div class="hero" style="margin-bottom:1.5rem;padding-bottom:1.5rem">
-      <div><h2>Dashboard <em>2026</em></h2><p>Vista ejecutiva de avance</p></div>
-      <div><div class="big-n" id="dpct">–<span>%</span></div><div class="pct-lbl">Completado</div></div>
-    </div>
-    <div class="dgrid">
-      <div class="dcard" id="cejes"><h3>Avance por eje estratégico</h3></div>
-      <div class="dcard" id="cmeses"><h3>Completadas por mes</h3></div>
-    </div>
-    <div class="dgrid">
-      <div class="dcard" id="cresp"><h3>Carga por responsable</h3></div>
-      <div class="dcard" id="cpend"><h3>Próximas pendientes</h3></div>
-    </div>
   </div>
 
   <!-- ── KPIs ── -->
@@ -1319,7 +1305,6 @@ function upd(id,field,val){
     const active=document.activeElement;
     const isTyping=active&&(active.tagName==='TEXTAREA'||active.tagName==='INPUT')&&active.type!=='date'&&active.type!=='number';
     if(!isTyping) render();
-    if(!isTyping&&document.getElementById('tab-dashboard').style.display!=='none') renderDash();
   }
 }
 
@@ -1421,7 +1406,6 @@ function renderDash(){
 function showTab(tab,btn){
   document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   document.getElementById('tab-tareas').style.display=tab==='tareas'?'':'none';
-  document.getElementById('tab-dashboard').style.display=tab==='dashboard'?'':'none';
   document.getElementById('tab-kpis').style.display=tab==='kpis'?'':'none';
   document.getElementById('tab-vacantes').style.display=tab==='vacantes'?'':'none';
   document.getElementById('tab-bajas').style.display=tab==='bajas'?'':'none';
@@ -1435,7 +1419,6 @@ function showTab(tab,btn){
     mesesCollapsed=new Set(MES.filter(m=>m!==mesActualNombre));
     render();
   }
-  if(tab==='dashboard')renderDash();
   if(tab==='kpis')renderKPIs();
   if(tab==='vacantes'){renderVacantes();renderVacMetrics();}
   if(tab==='bajas'){renderBajas();renderBajasTipoMes();renderRotMes();renderVacMetrics();}
@@ -2200,10 +2183,23 @@ function diasColor(dias,meta){
 // Las vacantes "pausada" se excluyen porque su estado es una decisión manual (freeze), no automática.
 function refreshVacStatuses(){
   let changed=false;
+  const openStates=['en-tiempo','atrasada','fuera','urgente'];
   vacs.forEach(v=>{
-    if(v.status==='pausada') return;
+    // Solo recalculamos entre los 4 estados "abiertos" que dependen de días transcurridos.
+    // Cubierta, Cubierta f/tiempo, Por ingresar y Pausada son decisiones manuales/finales — nunca se tocan aquí.
+    if(!openStates.includes(v.status)) return;
+    if(v.fechaIngreso || v.fechaSeleccion) return; // si ya tiene esas fechas, se deja como está
     const prev=v.status;
-    autoStatus(v);
+    if(!v.fechaSolicitud){
+      v.status='en-tiempo';
+    } else {
+      const hoy=new Date().toISOString().slice(0,10);
+      const dias=daysBetween(v.fechaSolicitud, hoy);
+      const meta=v.meta||20;
+      if(dias < meta) v.status='en-tiempo';
+      else if(dias < meta*1.5) v.status='atrasada';
+      else v.status='urgente';
+    }
     if(v.status!==prev) changed=true;
   });
   if(changed) dvsave();
