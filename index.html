@@ -497,7 +497,7 @@ tr:hover td{background:var(--white)}
       <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8a7f75;margin-bottom:6px">Avance general del plan</div>
       <div style="font-family:'DM Serif Display',serif;font-size:30px;line-height:1.1;color:#10100f;margin-bottom:12px">Plan de <em style="color:#C40E91;font-style:italic">Recursos Humanos</em></div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 0.75fr;gap:12px">
         <div style="display:flex;align-items:center;gap:14px;background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem 1.25rem;cursor:pointer" onclick="goToTareas()" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
           <svg id="exec-ring" width="100" height="100" viewBox="0 0 100 100" style="flex-shrink:0">
             <circle cx="50" cy="50" r="42" fill="none" stroke="#e0d8ce" stroke-width="10"/>
@@ -530,6 +530,14 @@ tr:hover td{background:var(--white)}
             </div>
             <div style="font-size:13px;color:#8a7f75" id="exec-ring2-sub">Cargando...</div>
           </div>
+        </div>
+
+        <div style="background:#f6f5ec;border:1px solid #e0d8ce;border-radius:12px;padding:1rem 1.25rem;display:flex;flex-direction:column;justify-content:center;gap:6px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75">Plantilla activa</div>
+          <input id="exec-plantilla" type="number" min="0"
+            style="font-family:'DM Serif Display',serif;font-size:36px;line-height:1;color:#10100f;border:none;background:transparent;width:100%;outline:none;padding:0"
+            placeholder="0" onchange="saveVacMeta('exec-plantilla')">
+          <div style="font-size:11px;color:#8a7f75">colaboradores · dato manual</div>
         </div>
       </div>
     </div>
@@ -791,6 +799,13 @@ tr:hover td{background:var(--white)}
       </div>
     </div>
 
+    <!-- PLANTILLA ACTIVA POR MES -->
+    <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Plantilla activa por mes</div>
+      <div id="vac-plantilla-mes" style="display:grid;grid-template-columns:repeat(12,1fr);gap:8px"></div>
+      <div style="font-size:11px;color:#8a7f75;margin-top:.75rem">Histórico mensual · edita cualquier mes para corregir un cierre</div>
+    </div>
+
     <!-- ROTACIÓN POR MES -->
     <div style="background:#fff;border:1px solid #e0d8ce;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem">
       <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a7f75;margin-bottom:1rem">Rotación por mes</div>
@@ -818,9 +833,9 @@ tr:hover td{background:var(--white)}
         <p>Liderazgo y comunicación para sostener el crecimiento exponencial · Inicio: 29 enero 2026</p>
       </div>
       <div class="cons-meta">
-        <span class="cons-chip active">Etapa 1 · Diagnóstico</span>
-        <span class="cons-chip active">Quick Wins</span>
-        <span class="cons-chip">Etapa 2 · Estrategia</span>
+        <span class="cons-chip" id="hellena-chip-diag">Etapa 1 · Diagnóstico</span>
+        <span class="cons-chip" id="hellena-chip-qw">Quick Wins</span>
+        <span class="cons-chip" id="hellena-chip-estr">Etapa 2 · Estrategia</span>
         <span class="cons-chip">Bring to Life</span>
       </div>
     </div>
@@ -904,10 +919,10 @@ tr:hover td{background:var(--white)}
         <p>Sistemas Humanos de México · 46 puestos · Inicio: abril 2026 · Cotización SH-C-J-20260128-01</p>
       </div>
       <div class="cons-meta">
-        <span class="cons-chip active">Etapa 1 · Valuación</span>
-        <span class="cons-chip active">Etapa 2 · Competitividad</span>
-        <span class="cons-chip">Etapa 3 · Tabulador</span>
-        <span class="cons-chip">Etapa 4 · Política</span>
+        <span class="cons-chip" id="sh-chip-e1">Etapa 1 · Valuación</span>
+        <span class="cons-chip" id="sh-chip-e2">Etapa 2 · Competitividad</span>
+        <span class="cons-chip" id="sh-chip-e3">Etapa 3 · Tabulador</span>
+        <span class="cons-chip" id="sh-chip-e4">Etapa 4 · Política</span>
       </div>
     </div>
 
@@ -1430,6 +1445,8 @@ function showTab(tab,btn){
 
 function renderEjecutivo(){
   if(typeof vacs!=='undefined') refreshVacStatuses();
+  const execPEl=document.getElementById('exec-plantilla');
+  if(execPEl&&!execPEl.value){ const m=loadVacMeta(); execPEl.value=m.plantilla; }
   const s=getStats();
   const pct=s.pct;
   // Ring (radio 42, circunferencia 263.9)
@@ -1693,10 +1710,18 @@ function savePlantillaHist(mes,anio){
   syncToSheets('plantilla_snaps',snaps);
   renderVacMetrics();
 }
-function saveVacMeta(){
-  const val=document.getElementById('vac-plantilla').value;
+function saveVacMeta(sourceId){
+  sourceId=sourceId||'vac-plantilla';
+  const srcEl=document.getElementById(sourceId);
+  const val=srcEl?srcEl.value:'';
   const meta={plantilla:val};
   localStorage.setItem(VAC_META_KEY,JSON.stringify(meta));
+  // Mantener sincronizados los dos campos (Ejecutivo y Bajas)
+  ['vac-plantilla','exec-plantilla'].forEach(id=>{
+    if(id===sourceId)return;
+    const el=document.getElementById(id);
+    if(el) el.value=val;
+  });
   // Guardar snapshot del mes actual
   if(val){
     const hoy=new Date();
@@ -1711,6 +1736,50 @@ function saveVacMeta(){
     syncToSheets('plantilla_snaps',snaps);
   }
   renderVacMetrics();
+}
+
+function savePlantillaMes(mes,anio,val){
+  const num=parseFloat(val);
+  if(isNaN(num)||num<0){alert('Ingresa un número válido de plantilla');return;}
+  const snaps=loadPlantillaSnaps();
+  const idx=snaps.findIndex(s=>s.mes===mes&&s.anio===anio);
+  const snap={mes,anio,plantilla:num};
+  if(idx>=0) snaps[idx]=snap; else snaps.push(snap);
+  localStorage.setItem(PLANTILLA_SNAP_KEY,JSON.stringify(snaps));
+  syncToSheets('plantilla_snaps',snaps);
+  // Si el mes corregido es el mes actual, refleja el valor en los campos manuales también
+  const hoy=new Date();
+  if(mes===hoy.getMonth()&&anio===hoy.getFullYear()){
+    const meta={plantilla:String(num)};
+    localStorage.setItem(VAC_META_KEY,JSON.stringify(meta));
+    ['vac-plantilla','exec-plantilla'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.value=num;
+    });
+  }
+  renderVacMetrics();
+}
+
+function renderPlantillaMes(){
+  const el=document.getElementById('vac-plantilla-mes');
+  if(!el)return;
+  const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const hoy=new Date();
+  const mesActual=hoy.getMonth();
+  const anioActual=hoy.getFullYear();
+  const snaps=loadPlantillaSnaps();
+  el.innerHTML=MESES.map((m,i)=>{
+    const val=getPlantillaParaMes(i,anioActual);
+    const tieneSnapPropio=snaps.some(s=>s.mes===i&&s.anio===anioActual);
+    const esMes=i===mesActual;
+    const border=esMes?'2px solid #C40E91':(tieneSnapPropio?'1px solid #e0d8ce':'1px dashed #d8cfc3');
+    const bg=esMes?'#fef0f7':(tieneSnapPropio?'#f6f5ec':'#fff');
+    return `<div style="border:${border};border-radius:10px;padding:8px 6px;text-align:center;background:${bg}">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:${esMes?'#C40E91':'#8a7f75'};margin-bottom:4px">${m.toUpperCase()}</div>
+      <input type="number" min="0" value="${val||''}" placeholder="—" onchange="savePlantillaMes(${i},${anioActual},this.value)" style="width:100%;text-align:center;border:none;background:transparent;font-family:'DM Serif Display',serif;font-size:16px;color:#10100f;outline:none;padding:0">
+      ${!tieneSnapPropio?`<div style="font-size:8px;color:#b07a92;margin-top:2px">estimado</div>`:''}
+    </div>`;
+  }).join('');
 }
 
 // ── BAJAS ──
@@ -1842,6 +1911,8 @@ function renderVacMetrics(){
   const meta=loadVacMeta();
   const pEl=document.getElementById('vac-plantilla');
   if(pEl&&!pEl.value) pEl.value=meta.plantilla;
+  const pElExec=document.getElementById('exec-plantilla');
+  if(pElExec&&!pElExec.value) pElExec.value=meta.plantilla;
 
   // Conteo de bajas del MES ACTUAL desde el registro
   const hoy=new Date();
@@ -1900,6 +1971,7 @@ function renderVacMetrics(){
 
   // Cuadritos por mes
   renderRotMes();
+  renderPlantillaMes();
   renderBajasTipoMes();
   renderVacSolMes();
   renderVacCubMes();
@@ -2336,7 +2408,7 @@ const KPI_SEED=[
   {id:'k1',eje:'AT',nombre:'Tiempo promedio de cobertura de vacantes',unidad:'días',meta:30,actual:'',notas:'',formula:'AUTO · Días hábiles promedio desde fecha solicitud hasta fecha ingreso de vacantes cubiertas',dir:'menor'},
   {id:'k2',eje:'AT',nombre:'Tasa de retención a 6 meses (nuevos ingresos)',unidad:'%',meta:85,actual:'',notas:'',formula:'Colaboradores que cumplen 6 meses sin baja ÷ total ingresos del periodo × 100 · Fuente: Supercompany',dir:'mayor'},
   {id:'k3',eje:'AT',nombre:'Tasa de retención a 12 meses (nuevos ingresos)',unidad:'%',meta:80,actual:'',notas:'',formula:'Colaboradores que cumplen 12 meses sin baja ÷ total ingresos del periodo × 100 · Fuente: Supercompany',dir:'mayor'},
-  {id:'k4',eje:'AT',nombre:'% posiciones clave cubiertas vs. plantilla planeada',unidad:'%',meta:90,actual:'',notas:'',formula:'AUTO · Vacantes cubiertas ÷ plantilla activa × 100',dir:'mayor'},
+  {id:'k4',eje:'AT',nombre:'% Cobertura de plantilla (activos vs. planeada)',unidad:'%',meta:90,actual:'',notas:'',formula:'AUTO · Colaboradores activos ÷ (activos + vacantes abiertas) × 100',dir:'mayor'},
   {id:'k5',eje:'CA',nombre:'Horas de capacitación por colaborador (trimestral)',unidad:'hrs',meta:8,actual:'',notas:'',formula:'Total horas capacitación ÷ total colaboradores activos · Fuente: LMS Juniper / registros RH',dir:'mayor'},
   {id:'k7',eje:'CA',nombre:'% de avance DNC ejecutada vs. planeada',unidad:'%',meta:80,actual:'',notas:'',formula:'Acciones DNC ejecutadas ÷ acciones DNC planeadas × 100 · Fuente: seguimiento Hellena',dir:'mayor'},
   {id:'k8',eje:'DF',nombre:'NPS interno programa Hellena (líderes)',unidad:'pts',meta:70,actual:'',notas:'',formula:'% promotores − % detractores · Escala 0-10 · Fuente: encuesta Hellena',dir:'mayor'},
@@ -2387,14 +2459,15 @@ function autoKPIs(){
     if(k1){ k1.actual=tprom; k1.auto=true; k1.notas=k1.notas||'Calculado automáticamente desde vacantes cubiertas'; }
   }
 
-  // k4 — % posiciones clave cubiertas vs plantilla
+  // k4 — % Cobertura de plantilla: activos ÷ (activos + vacantes abiertas) × 100
   const meta=loadVacMeta();
-  const plantilla=parseFloat(meta.plantilla)||0;
-  if(plantilla>0){
-    const cubiertasN=vacs.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
-    const pct=Math.round(cubiertasN/plantilla*100*10)/10;
+  const activosK4=parseFloat(meta.plantilla)||0;
+  const vacAbiertasK4=vacs.filter(v=>!['cubierta','cubierta-fuera','pausada'].includes(v.status)).length;
+  const plantillaPlaneadaK4=activosK4+vacAbiertasK4;
+  if(plantillaPlaneadaK4>0){
+    const pct=Math.round(activosK4/plantillaPlaneadaK4*100*10)/10;
     const k4=kpis.find(k=>k.id==='k4');
-    if(k4){ k4.actual=pct; k4.auto=true; k4.notas=k4.notas||'Calculado automáticamente: '+cubiertasN+' cubiertas / '+plantilla+' plantilla'; }
+    if(k4){ k4.actual=pct; k4.auto=true; k4.notas='Calculado automáticamente: '+activosK4+' activos ÷ ('+activosK4+' activos + '+vacAbiertasK4+' vacantes abiertas = '+plantillaPlaneadaK4+' plantilla planeada)'; }
   }
 
   // k16 — Avance política de sueldos (entregables SH completados)
@@ -2653,6 +2726,9 @@ function renderHellena(){
       <div style="min-width:90px">${statusTag}</div>
       <div style="font-size:11px;color:#8a7f75;min-width:120px">${done} entregados · ${prog} en proceso${late?` · <span style="color:#8b1a1a">${late} retraso</span>`:''}</div>
     </div>`;
+    const hChipIds={'Diagnóstico':'hellena-chip-diag','Quick Wins':'hellena-chip-qw','Estrategia':'hellena-chip-estr'};
+    const hChipEl=document.getElementById(hChipIds[et]);
+    if(hChipEl) hChipEl.classList.toggle('active', pct===100);
   });
   document.getElementById('hellena-etapas').innerHTML=etapaHtml;
   const hLate=hbl.hostech.filter(i=>i.status==='con-retraso').length;
@@ -2769,6 +2845,9 @@ function renderSueldos(){
       <div style="min-width:90px">${tag}</div>
       <div style="font-size:11px;color:#8a7f75;min-width:110px">${done} entregados · ${prog} en proceso</div>
     </div>`;
+    const shChipIds={'Etapa 1':'sh-chip-e1','Etapa 2':'sh-chip-e2','Etapa 3':'sh-chip-e3','Etapa 4':'sh-chip-e4'};
+    const shChipEl=document.getElementById(shChipIds[et]);
+    if(shChipEl) shChipEl.classList.toggle('active', pct===100);
   });
   document.getElementById('sh-etapas').innerHTML=etHtml;
 
