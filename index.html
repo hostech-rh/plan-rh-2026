@@ -2380,7 +2380,7 @@ function renderVacantes(){
           const dias=diasActivosStr(v);
           const dc=typeof dias==='number'?diasColor(dias,v.meta):'transparent';
           html+=`<tr>
-            <td style="min-width:170px"><div style="display:flex;align-items:flex-start;gap:4px"><textarea id="vi-${v.id}" class="vac-input" placeholder="Nombre del puesto" oninput="updVac('${v.id}','puesto',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.puesto||'').replace(/</g,'&lt;')}</textarea><button class="del-btn" onclick="delVacante('${v.id}')" title="Eliminar vacante" style="flex-shrink:0">×</button></div></td>
+            <td style="min-width:170px"><div style="display:flex;align-items:flex-start;gap:4px"><textarea id="vi-${v.id}" class="vac-input" placeholder="Nombre del puesto" oninput="updVac('${v.id}','puesto',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;min-width:0;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.puesto||'').replace(/</g,'&lt;')}</textarea><button class="del-btn" onclick="delVacante('${v.id}')" title="Eliminar vacante" style="flex-shrink:0">×</button></div></td>
             <td style="min-width:150px"><textarea class="vac-input" placeholder="Área" oninput="updVac('${v.id}','area',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.area||'').replace(/</g,'&lt;')}</textarea></td>
             <td><input class="vac-input" type="date" value="${v.fechaSolicitud||''}" onchange="updVac('${v.id}','fechaSolicitud',this.value)"></td>
             <td><span class="dias-badge" style="background:${dc}">${dias}</span></td>
@@ -2406,6 +2406,7 @@ function renderVacantes(){
     });
   }
   document.getElementById('vac-body').innerHTML=html;
+  document.querySelectorAll('#vac-body textarea').forEach(t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px';});
   renderVacSemaforoResumen();
 }
 
