@@ -179,8 +179,10 @@ tr:hover td{background:var(--white)}
 .vs-pausada{background:#f5f0e0;color:#7a6a2a;border-color:#d4c070}
 .vs-por-ingresar{background:var(--cream);color:var(--ink-muted);border-color:var(--border)}
 .dias-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}
-.del-btn{background:none;border:none;cursor:pointer;color:var(--ink-faint);font-size:16px;padding:2px 6px;border-radius:4px;line-height:1}
-.del-btn:hover{color:#8b1a1a;background:#fde8e8}
+.del-btn{background:#fde8e8;border:none;cursor:pointer;color:#b84a4a;font-size:16px;padding:4px 8px;border-radius:4px;line-height:1}
+.del-btn:hover{color:#8b1a1a;background:#fbd4d4}
+.vac-table td.vac-del-col,.vac-table th.vac-del-col{position:sticky;right:0;background:var(--cream);box-shadow:-4px 0 6px -4px rgba(0,0,0,.15);text-align:center;z-index:2}
+.vac-table tr:hover td.vac-del-col{background:var(--white)}
 .vac-sel-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-top:4px}
 .tiempo-chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:var(--blue-soft);color:var(--blue)}
 
@@ -721,7 +723,7 @@ tr:hover td{background:var(--white)}
             <th style="width:115px">Fecha pausa</th>
             <th style="width:115px">Fecha ingreso</th>
             <th style="width:80px">Sel → Ingreso</th>
-            <th style="width:32px"></th>
+            <th class="vac-del-col" style="width:40px"></th>
           </tr></thead>
           <tbody id="vac-body"></tbody>
         </table>
@@ -2378,7 +2380,7 @@ function renderVacantes(){
           const dias=diasActivosStr(v);
           const dc=typeof dias==='number'?diasColor(dias,v.meta):'transparent';
           html+=`<tr>
-            <td style="min-width:170px"><textarea id="vi-${v.id}" class="vac-input" placeholder="Nombre del puesto" oninput="updVac('${v.id}','puesto',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.puesto||'').replace(/</g,'&lt;')}</textarea></td>
+            <td style="min-width:170px"><div style="display:flex;align-items:flex-start;gap:4px"><textarea id="vi-${v.id}" class="vac-input" placeholder="Nombre del puesto" oninput="updVac('${v.id}','puesto',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.puesto||'').replace(/</g,'&lt;')}</textarea><button class="del-btn" onclick="delVacante('${v.id}')" title="Eliminar vacante" style="flex-shrink:0">×</button></div></td>
             <td style="min-width:150px"><textarea class="vac-input" placeholder="Área" oninput="updVac('${v.id}','area',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="width:100%;resize:none;overflow:hidden;min-height:32px;line-height:1.4">${(v.area||'').replace(/</g,'&lt;')}</textarea></td>
             <td><input class="vac-input" type="date" value="${v.fechaSolicitud||''}" onchange="updVac('${v.id}','fechaSolicitud',this.value)"></td>
             <td><span class="dias-badge" style="background:${dc}">${dias}</span></td>
@@ -2392,7 +2394,7 @@ function renderVacantes(){
             <td style="opacity:${v.status==='pausada'?'1':'0.35'}"><input class="vac-input" type="date" value="${v.fechaPausa||''}" onchange="updVac('${v.id}','fechaPausa',this.value)" title="Fecha en que se pausó la vacante" ${v.status!=='pausada'?'tabindex="-1"':''}></td>
             <td><input class="vac-input" type="date" value="${v.fechaIngreso||''}" onchange="updVac('${v.id}','fechaIngreso',this.value)"></td>
             <td style="text-align:center">${selIngresoStr(v)}</td>
-            <td><button class="del-btn" onclick="delVacante('${v.id}')" title="Eliminar">×</button></td>
+            <td class="vac-del-col"><button class="del-btn" onclick="delVacante('${v.id}')" title="Eliminar">×</button></td>
           </tr>
           <tr style="border-bottom:2px solid var(--border)">
             <td colspan="11" style="padding-top:0;padding-bottom:10px">
