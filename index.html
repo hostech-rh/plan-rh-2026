@@ -85,6 +85,7 @@ tr:hover td{background:var(--white)}
 .mhdr-poringresar td{background:#d6edf9;color:#1a5e8a;border-bottom:2px solid #7ac4e8}
 .mhdr-cubiertas td{background:#d4f5e0;color:#1a6b3a;border-bottom:2px solid #7dd6a0}
 .mhdr-pausadas td{background:#f5f0e0;color:#7a6a2a;border-bottom:2px solid #d4c070}
+.mhdr-inactivas td{background:#e8e6e2;color:#6a655c;border-bottom:2px solid #c8c2b8}
 
 /* EJE BADGES */
 .eb{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:.04em}
@@ -103,6 +104,7 @@ tr:hover td{background:var(--white)}
 .sPend{background:var(--white);color:var(--ink-muted);border-color:var(--border)}
 .sNa{background:#f1efe8;color:#b0a898;border-color:#d8d3c8;text-decoration:line-through;opacity:.7}
 .sRepr{background:#ede8ff;color:#4a28c4;border-color:#b8a8f0;font-style:italic}
+.sDep{background:#fde8d4;color:#a85a00;border-color:#f0b878}
 
 /* NOTES */
 .ni{font-family:'DM Sans',sans-serif;font-size:12.5px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--ink-soft);width:100%;min-width:110px;outline:none;transition:border-color .2s}
@@ -177,6 +179,7 @@ tr:hover td{background:var(--white)}
 .vs-cubierta{background:var(--blue-soft);color:var(--blue);border-color:#a0b4ff}
 .vs-cubierta-fuera{background:#ede8ff;color:#4a28c4;border-color:#b8a8f0}
 .vs-pausada{background:#f5f0e0;color:#7a6a2a;border-color:#d4c070}
+.vs-inactiva{background:#e8e6e2;color:#6a655c;border-color:#c8c2b8}
 .vs-por-ingresar{background:var(--cream);color:var(--ink-muted);border-color:var(--border)}
 .dias-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}
 .del-btn{background:#fde8e8;border:none;cursor:pointer;color:#b84a4a;font-size:16px;padding:4px 8px;border-radius:4px;line-height:1}
@@ -442,7 +445,7 @@ tr:hover td{background:var(--white)}
       <select class="fs" id="fSt" onchange="render()">
         <option value="">Todos los estados</option>
         <option>Completada</option><option>Iniciada</option><option>En progreso</option>
-        <option>Sin iniciar</option><option>Bloqueada</option><option>No aplica este año</option><option>Reprogramada</option>
+        <option>Sin iniciar</option><option>Bloqueada</option><option>Con dependencia</option><option>No aplica este año</option><option>Reprogramada</option>
       </select>
       <input class="fs" id="fQ" placeholder="Buscar tarea o responsable..." oninput="render()">
       <button onclick="addTarea()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">+ Nueva tarea</button>
@@ -1200,9 +1203,10 @@ function getStats(){
     done=active.filter(t=>t.status==='Completada').length,
     init=active.filter(t=>t.status==='Iniciada').length,
     prog=active.filter(t=>t.status==='En progreso').length,
-    blok=active.filter(t=>t.status==='Bloqueada').length;
+    blok=active.filter(t=>t.status==='Bloqueada').length,
+    dep=active.filter(t=>t.status==='Con dependencia').length;
   const pct=total?Math.round((done+init*0.5)/total*100):0;
-  return{total,done,init,prog,blok,na,pend:total-done-init-prog-blok,pct};
+  return{total,done,init,prog,blok,dep,na,pend:total-done-init-prog-blok-dep,pct};
 }
 function renderMeta(){
   const s=getStats();
@@ -1215,11 +1219,12 @@ function renderMeta(){
     <div class="pill"><span class="pdot" style="background:var(--cyan)"></span><strong>${s.init}</strong> iniciadas</div>
     <div class="pill"><span class="pdot" style="background:#8a6800"></span><strong>${s.prog}</strong> en progreso</div>
     <div class="pill"><span class="pdot" style="background:#8b1a1a"></span><strong>${s.blok}</strong> bloqueadas</div>
+    <div class="pill"><span class="pdot" style="background:#a85a00"></span><strong>${s.dep}</strong> con dependencia</div>
     <div class="pill"><span class="pdot" style="background:var(--ink-faint)"></span><strong>${s.pend}</strong> sin iniciar</div>
     ${s.na?`<div class="pill sNa" style="font-size:12px"><strong>${s.na}</strong> no aplica este año</div>`:''}
   `;
 }
-function scls(v){return{'Completada':'sDone','Iniciada':'sInit','En progreso':'sProg','Bloqueada':'sBlok','Sin iniciar':'sPend','No aplica este año':'sNa','Reprogramada':'sRepr'}[v]||'sPend';}
+function scls(v){return{'Completada':'sDone','Iniciada':'sInit','En progreso':'sProg','Bloqueada':'sBlok','Con dependencia':'sDep','Sin iniciar':'sPend','No aplica este año':'sNa','Reprogramada':'sRepr'}[v]||'sPend';}
 // Meses colapsados en la pestaña de Tareas (Set de nombres de mes)
 let mesesCollapsed=new Set();
 
@@ -1274,12 +1279,13 @@ function render(){
           <option ${t.status==='En progreso'?'selected':''}>En progreso</option>
           <option ${t.status==='Completada'?'selected':''}>Completada</option>
           <option ${t.status==='Bloqueada'?'selected':''}>Bloqueada</option>
+          <option ${t.status==='Con dependencia'?'selected':''}>Con dependencia</option>
           <option ${t.status==='Reprogramada'?'selected':''}>Reprogramada</option>
           <option ${t.status==='No aplica este año'?'selected':''}>No aplica este año</option>
         </select></td>
         <td>${t.status==='Reprogramada'?'<select class="fs" style="font-size:11px;padding:3px 6px;width:100%" onchange="upd('+t.id+',\'nuevoMes\',this.value)">'+MES.map(m=>'<option '+(t.nuevoMes===m?'selected':'')+'>'+m+'</option>').join('')+'</select>':'<span style="font-size:12px;color:var(--ink-faint)">—</span>'}</td>
         <td style="min-width:160px"><textarea class="ni" placeholder="Opcional..." oninput="upd(${t.id},'entregable',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" onblur="render()" style="width:100%;resize:none;overflow:hidden;min-height:28px;line-height:1.4">${(t.entregable||'').replace(/</g,'&lt;')}</textarea></td>
-        <td style="min-width:160px"><textarea class="ni" placeholder="Agregar nota..." oninput="upd(${t.id},'notas',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" onblur="render()" style="width:100%;resize:none;overflow:hidden;min-height:28px;line-height:1.4">${(t.notas||'').replace(/</g,'&lt;')}</textarea></td>
+        <td style="min-width:160px"><textarea class="ni" placeholder="${t.status==='Con dependencia'?'¿De qué área, proyecto o persona depende?':'Agregar nota...'}" oninput="upd(${t.id},'notas',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" onblur="render()" style="width:100%;resize:none;overflow:hidden;min-height:28px;line-height:1.4${t.status==='Con dependencia'&&!t.notas?';border-color:#f0b878;background:#fef8f0':''}">${(t.notas||'').replace(/</g,'&lt;')}</textarea></td>
         <td><button onclick="delTarea(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--ink-faint);font-size:15px;padding:2px 4px;border-radius:4px" title="Eliminar">×</button></td>
       </tr>`;
       }); // fin forEach tareas del mes
@@ -1555,6 +1561,7 @@ function renderEjecutivo(){
     {label:'En progreso',count:s.prog,color:'#4563ff',dot:'#4563ff'},
     {label:'Sin iniciar',count:s.pend,color:'#c4bbb0',dot:'#c4bbb0'},
     {label:'Bloqueadas',count:s.blok,color:'#e05533',dot:'#e05533'},
+    {label:'Con dependencia',count:s.dep,color:'#a85a00',dot:'#a85a00'},
   ];
   let stHtml='';
   stData.forEach(d=>{
@@ -1594,7 +1601,7 @@ function renderEjecutivo(){
     vacHtml='<div style="font-size:13px;color:var(--ink-muted);padding:8px 0">No hay vacantes registradas</div>';
   } else {
     const vacsV=vacs.filter(v=>(v.puesto||'').trim());
-    const activas=vacsV.filter(v=>!['cubierta','cubierta-fuera','pausada'].includes(v.status));
+    const activas=vacsV.filter(v=>!['cubierta','cubierta-fuera','pausada','inactiva'].includes(v.status));
     const urgentes=activas.filter(v=>v.status==='urgente');
     const atrasadas=activas.filter(v=>['atrasada','fuera'].includes(v.status));
     const enTiempo=activas.filter(v=>v.status==='en-tiempo');
@@ -1644,6 +1651,7 @@ const STATUS_VAC=[
   {val:'cubierta-fuera',label:'Cubierta f/tiempo',  cls:'vs-cubierta-fuera'},
   {val:'por-ingresar',label:'Por ingresar',         cls:'vs-por-ingresar'},
   {val:'pausada',     label:'Pausada',               cls:'vs-pausada'},
+  {val:'inactiva',    label:'Inactiva',              cls:'vs-inactiva'},
 ];
 // ── BLOQUES DE VACANTES (semáforo de cobertura) ──
 const VAC_BLOQUES=[
@@ -1651,8 +1659,9 @@ const VAC_BLOQUES=[
   {key:'por-ingresar', label:'Por ingresar',      match:v=>v.status==='por-ingresar'},
   {key:'cubiertas',    label:'Cubiertas',         match:v=>['cubierta','cubierta-fuera'].includes(v.status)},
   {key:'pausadas',     label:'Pausadas',          match:v=>v.status==='pausada'},
+  {key:'inactivas',    label:'Inactivas',         match:v=>v.status==='inactiva'},
 ];
-let vacBloquesCollapsed=new Set(['cubiertas','pausadas']);
+let vacBloquesCollapsed=new Set(['cubiertas','pausadas','inactivas']);
 function toggleVacBloque(key){
   if(vacBloquesCollapsed.has(key)) vacBloquesCollapsed.delete(key);
   else vacBloquesCollapsed.add(key);
@@ -1956,7 +1965,7 @@ function renderVacMetrics(){
 
   // Tiempo promedio vacantes ACTIVAS (días sin cubrir hasta hoy)
   const hoyISO=new Date().toISOString().slice(0,10);
-  const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&v.fechaSolicitud<=hoyISO&&!['cubierta','cubierta-fuera','pausada'].includes(v.status));
+  const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&v.fechaSolicitud<=hoyISO&&!['cubierta','cubierta-fuera','pausada','inactiva'].includes(v.status));
   const tpromActivas=actvasConFecha.length?Math.round(actvasConFecha.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,hoyISO),0)/actvasConFecha.length):null;
   const tpaEl=document.getElementById('vac-tprom-activas');
   if(tpaEl) tpaEl.textContent=tpromActivas?tpromActivas+' días':'–';
@@ -1969,7 +1978,7 @@ function renderVacMetrics(){
 
   // Conteos vacantes (ignora filas sin puesto)
   const vacsValidasM=vacs.filter(v=>(v.puesto||'').trim());
-  const activas=vacsValidasM.filter(v=>!['cubierta','cubierta-fuera','pausada'].includes(v.status)).length;
+  const activas=vacsValidasM.filter(v=>!['cubierta','cubierta-fuera','pausada','inactiva'].includes(v.status)).length;
   const cubiertasN=vacsValidasM.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
   const aEl=document.getElementById('vac-activas-n');
   const cEl=document.getElementById('vac-cubiertas-n');
@@ -2174,6 +2183,9 @@ function updVac(id,field,val){
 }
 
 function autoStatus(v){
+  // Estados manuales/congelados: no se tocan automáticamente salvo que ya haya fecha de ingreso
+  // (si contrataron a alguien, sí debe pasar a Cubierta aunque estuviera Pausada o Inactiva)
+  if((v.status==='pausada'||v.status==='inactiva') && !v.fechaIngreso){ return; }
   // Si ya tiene fecha ingreso → cubierta o cubierta f/tiempo
   if(v.fechaIngreso){
     const dias=daysBetween(v.fechaSolicitud, v.fechaIngreso);
@@ -2226,6 +2238,7 @@ function daysBetween(d1,d2){
 
 function diasActivosStr(v){
   if(!v.fechaSolicitud)return'–';
+  if(v.status==='inactiva')return'–'; // inactiva: no corre el tiempo
   const hoy=new Date().toISOString().slice(0,10);
   if(v.fechaSolicitud>hoy) return 0; // aún no inicia (fecha futura)
   let end;
@@ -2348,16 +2361,18 @@ function renderVacantes(){
   // Summary (ignora filas sin puesto llenado, ej. agregadas por error)
   const vacsValidas=vacs.filter(v=>(v.puesto||'').trim());
   const total=vacsValidas.length;
-  const activas=vacsValidas.filter(v=>!['cubierta','cubierta-fuera','pausada'].includes(v.status)).length;
+  const activas=vacsValidas.filter(v=>!['cubierta','cubierta-fuera','pausada','inactiva'].includes(v.status)).length;
   const cubiertas=vacsValidas.filter(v=>['cubierta','cubierta-fuera'].includes(v.status)).length;
   const urgentes=vacsValidas.filter(v=>v.status==='urgente').length;
   const porIngresar=vacsValidas.filter(v=>v.status==='por-ingresar').length;
+  const inactivas=vacsValidas.filter(v=>v.status==='inactiva').length;
   document.getElementById('vac-summary').innerHTML=`
     <div class="vac-pill"><span class="pdot" style="background:var(--ink)"></span><strong>${total}</strong> vacantes totales</div>
     <div class="vac-pill"><span class="pdot" style="background:#fad83f"></span><strong>${activas}</strong> activas</div>
     <div class="vac-pill"><span class="pdot" style="background:#4563ff"></span><strong>${cubiertas}</strong> cubiertas</div>
     <div class="vac-pill"><span class="pdot" style="background:#4ade80"></span><strong>${porIngresar}</strong> por ingresar</div>
     ${urgentes?`<div class="vac-pill"><span class="pdot" style="background:#f87171"></span><strong>${urgentes}</strong> urgentes</div>`:''}
+    ${inactivas?`<div class="vac-pill"><span class="pdot" style="background:#a8a29e"></span><strong>${inactivas}</strong> inactivas</div>`:''}
   `;
 
   // Rows agrupadas por bloque (Abiertas · Por ingresar · Cubiertas · Pausadas)
@@ -2376,7 +2391,7 @@ function renderVacantes(){
         rows.forEach(v=>{cont[v.status]=(cont[v.status]||0)+1;});
         semHtml=Object.entries(SEM_COLORS).map(([st,color])=>cont[st]?`<span style="color:${color};font-weight:700;margin-left:12px">● ${cont[st]}</span>`:'').join('');
       }
-      const blockClass={'abiertas':'mhdr-abiertas','por-ingresar':'mhdr-poringresar','cubiertas':'mhdr-cubiertas','pausadas':'mhdr-pausadas'}[b.key]||'mhdr-mes';
+      const blockClass={'abiertas':'mhdr-abiertas','por-ingresar':'mhdr-poringresar','cubiertas':'mhdr-cubiertas','pausadas':'mhdr-pausadas','inactivas':'mhdr-inactivas'}[b.key]||'mhdr-mes';
       html+=`<tr class="mhdr-block ${blockClass}" onclick="toggleVacBloque('${b.key}')" style="cursor:pointer;user-select:none">
         <td colspan="11">
           <span style="font-size:13px;margin-right:6px">${collapsed?'▸':'▾'}</span>${b.label} · ${rows.length}${semHtml}
@@ -2475,7 +2490,7 @@ function autoKPIs(){
   // k4 — % Cobertura de plantilla: activos ÷ (activos + vacantes abiertas) × 100
   const meta=loadVacMeta();
   const activosK4=parseFloat(meta.plantilla)||0;
-  const vacAbiertasK4=vacs.filter(v=>!['cubierta','cubierta-fuera','pausada'].includes(v.status)).length;
+  const vacAbiertasK4=vacs.filter(v=>!['cubierta','cubierta-fuera','pausada','inactiva'].includes(v.status)).length;
   const plantillaPlaneadaK4=activosK4+vacAbiertasK4;
   if(plantillaPlaneadaK4>0){
     const pct=Math.round(activosK4/plantillaPlaneadaK4*100*10)/10;
