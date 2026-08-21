@@ -1955,8 +1955,9 @@ function renderVacMetrics(){
   }
 
   // Tiempo promedio vacantes ACTIVAS (días sin cubrir hasta hoy)
-  const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&!['cubierta','cubierta-fuera','pausada'].includes(v.status));
-  const tpromActivas=actvasConFecha.length?Math.round(actvasConFecha.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,new Date().toISOString().slice(0,10)),0)/actvasConFecha.length):null;
+  const hoyISO=new Date().toISOString().slice(0,10);
+  const actvasConFecha=vacs.filter(v=>v.fechaSolicitud&&v.fechaSolicitud<=hoyISO&&!['cubierta','cubierta-fuera','pausada'].includes(v.status));
+  const tpromActivas=actvasConFecha.length?Math.round(actvasConFecha.reduce((acc,v)=>acc+daysBetween(v.fechaSolicitud,hoyISO),0)/actvasConFecha.length):null;
   const tpaEl=document.getElementById('vac-tprom-activas');
   if(tpaEl) tpaEl.textContent=tpromActivas?tpromActivas+' días':'–';
 
@@ -2184,6 +2185,7 @@ function autoStatus(v){
   // Sin fechas especiales → calcular semáforo por días activos hasta hoy
   if(!v.fechaSolicitud){ v.status='en-tiempo'; return; }
   const hoy=new Date().toISOString().slice(0,10);
+  if(v.fechaSolicitud>hoy){ v.status='en-tiempo'; return; } // aún no inicia
   const dias=daysBetween(v.fechaSolicitud, hoy);
   const meta=v.meta||20;
   if(dias < meta*0.7)      v.status='en-tiempo';
@@ -2225,6 +2227,7 @@ function daysBetween(d1,d2){
 function diasActivosStr(v){
   if(!v.fechaSolicitud)return'–';
   const hoy=new Date().toISOString().slice(0,10);
+  if(v.fechaSolicitud>hoy) return 0; // aún no inicia (fecha futura)
   let end;
   if(v.status==='pausada'&&v.fechaPausa&&v.fechaPausa<=hoy){
     // Vacante pausada → congelar en fecha de pausa
@@ -2272,11 +2275,14 @@ function refreshVacStatuses(){
       v.status='en-tiempo';
     } else {
       const hoy=new Date().toISOString().slice(0,10);
-      const dias=daysBetween(v.fechaSolicitud, hoy);
-      const meta=v.meta||20;
-      if(dias < meta) v.status='en-tiempo';
-      else if(dias < meta*1.5) v.status='atrasada';
-      else v.status='urgente';
+      if(v.fechaSolicitud>hoy){ v.status='en-tiempo'; }
+      else {
+        const dias=daysBetween(v.fechaSolicitud, hoy);
+        const meta=v.meta||20;
+        if(dias < meta) v.status='en-tiempo';
+        else if(dias < meta*1.5) v.status='atrasada';
+        else v.status='urgente';
+      }
     }
     if(v.status!==prev) changed=true;
   });
