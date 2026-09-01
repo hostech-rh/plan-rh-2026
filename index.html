@@ -473,18 +473,25 @@ tr:hover td{background:var(--white)}
 
   </div>
 
-  <!-- ── TAREAS (COPIA / RESPALDO) ── -->
+  <!-- ── TAREAS (COPIA DE TRABAJO) ── -->
   <div id="tab-tareasCopia" style="display:none">
     <div class="hero">
       <div>
-        <h2>Copia de <em>respaldo</em></h2>
-        <p>Instantánea de solo lectura de la pestaña Tareas · úsala para comparar mientras corriges</p>
+        <h2>Tareas <em>(Copia)</em></h2>
+        <p>Copia de trabajo editable · corrige aquí agosto–diciembre sin tocar la versión oficial</p>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <button onclick="crearCopiaTareas()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">🔄 Crear / Actualizar copia</button>
+      <div>
+        <div class="big-n" id="hero-pct2">–<span>%</span></div>
+        <div class="pct-lbl">Avance general (copia)</div>
       </div>
     </div>
-    <div id="copia-info" style="font-size:12.5px;color:var(--ink-muted);margin:-0.5rem 0 1rem 0;padding:0 .25rem"></div>
+    <div class="prog-strip"><div class="prog-fill" id="prog2" style="width:0%"></div></div>
+    <div class="pills" id="pills2"></div>
+    <div id="copia-info" style="font-size:12.5px;color:var(--ink-muted);margin:.25rem 0 1rem 0;padding:0 .25rem"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1rem">
+      <button onclick="crearCopiaTareas()" title="Sobrescribe esta copia con lo que hay ahora mismo en la pestaña Tareas oficial" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:var(--ink-faint);color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">🔄 Reiniciar copia desde Tareas actual</button>
+      <button onclick="promoverCopiaAFinal()" title="Reemplaza la pestaña Tareas oficial con lo que hay en esta copia, y sincroniza a Sheets" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#1a6b3a;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">✅ Autorizar y aplicar como versión final</button>
+    </div>
     <div class="filters">
       <select class="fs" id="fMes2" onchange="renderCopia()">
         <option value="">Todos los meses</option>
@@ -506,6 +513,9 @@ tr:hover td{background:var(--white)}
         <option>Sin iniciar</option><option>Bloqueada</option><option>Con dependencia</option><option>No aplica este año</option><option>Reprogramada</option>
       </select>
       <input class="fs" id="fQ2" placeholder="Buscar tarea o responsable..." oninput="renderCopia()">
+      <button onclick="addTareaCopia()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">+ Nueva tarea</button>
+      <button onclick="mesesCollapsedCopy=new Set();renderCopia()" title="Expandir todos los meses" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--ink-faint);color:var(--white);border:none;cursor:pointer" onmouseover="this.style.background='#888'" onmouseout="this.style.background='var(--ink-faint)'">▾ Todo</button>
+      <button onclick="mesesCollapsedCopy=new Set(MES);renderCopia()" title="Colapsar todos los meses" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--ink-faint);color:var(--white);border:none;cursor:pointer" onmouseover="this.style.background='#888'" onmouseout="this.style.background='var(--ink-faint)'">▸ Todo</button>
     </div>
     <div class="twrap">
       <table>
@@ -515,8 +525,10 @@ tr:hover td{background:var(--white)}
           <th style="min-width:200px">Acción</th>
           <th style="width:110px">Responsable</th>
           <th style="width:118px">Estado</th>
+          <th style="width:90px">Nuevo mes</th>
           <th style="min-width:160px">Entregable obtenido</th>
           <th style="min-width:160px">Notas</th>
+          <th style="width:28px"></th>
         </tr></thead>
         <tbody id="tbody2"></tbody>
       </table>
@@ -1409,30 +1421,75 @@ function delTarea(id){
   dsave();renderMeta();render();
 }
 
-// ── COPIA DE RESPALDO DE TAREAS (solo lectura, solo local, NO se sincroniza a Sheets) ──
+// ── TAREAS (COPIA DE TRABAJO) ──
+// Copia fiel y 100% editable de "tasks", totalmente independiente y NO sincronizada a
+// Sheets hasta que se autorice explícitamente con promoverCopiaAFinal().
 const COPIA_KEY='hostech_rh2026_v1_tareas_copia';
 const COPIA_META_KEY='hostech_rh2026_v1_tareas_copia_meta';
 let tasksCopy=JSON.parse(localStorage.getItem(COPIA_KEY)||'null');
 let copiaMeta=JSON.parse(localStorage.getItem(COPIA_META_KEY)||'null');
+let mesesCollapsedCopy=new Set();
+let stimerCopy=null;
 
-function crearCopiaTareas(){
-  if(tasksCopy && !confirm('Ya existe una copia guardada del '+(copiaMeta?copiaMeta.fecha:'')+'.\n¿Quieres sobrescribirla con los datos ACTUALES de la pestaña Tareas?')) return;
-  tasksCopy=JSON.parse(JSON.stringify(tasks)); // copia profunda, independiente de "tasks"
+function crearCopiaTareas(silencioso){
+  if(!silencioso && tasksCopy && tasksCopy.length && !confirm('Esto SOBRESCRIBIRÁ la copia actual (y cualquier corrección que ya hayas hecho ahí) con lo que hay AHORA MISMO en la pestaña Tareas oficial.\n\n¿Continuar?')) return;
+  tasksCopy=JSON.parse(JSON.stringify(tasks)); // copia profunda y fiel, independiente de "tasks"
   copiaMeta={fecha:new Date().toLocaleString('es-MX')};
   localStorage.setItem(COPIA_KEY,JSON.stringify(tasksCopy));
   localStorage.setItem(COPIA_META_KEY,JSON.stringify(copiaMeta));
+  const mesActualNombre=MES[new Date().getMonth()];
+  mesesCollapsedCopy=new Set(MES.filter(m=>m!==mesActualNombre));
+  renderMetaCopia();
+  renderCopia();
+}
+
+function saveCopiaData(){
+  localStorage.setItem(COPIA_KEY,JSON.stringify(tasksCopy));
+  copiaMeta={fecha:new Date().toLocaleString('es-MX')};
+  localStorage.setItem(COPIA_META_KEY,JSON.stringify(copiaMeta));
+}
+function dsaveCopia(){clearTimeout(stimerCopy);stimerCopy=setTimeout(saveCopiaData,600);}
+
+function getStatsCopy(){
+  const list=tasksCopy||[];
+  const na=list.filter(t=>t.status==='No aplica este año'||t.status==='Reprogramada').length;
+  const active=list.filter(t=>t.status!=='No aplica este año'&&t.status!=='Reprogramada');
+  const total=active.length,
+    done=active.filter(t=>t.status==='Completada').length,
+    init=active.filter(t=>t.status==='Iniciada').length,
+    prog=active.filter(t=>t.status==='En progreso').length,
+    blok=active.filter(t=>t.status==='Bloqueada').length,
+    dep=active.filter(t=>t.status==='Con dependencia').length;
+  const pct=total?Math.round((done+init*0.5)/total*100):0;
+  return{total,done,init,prog,blok,dep,na,pend:total-done-init-prog-blok-dep,pct};
+}
+function renderMetaCopia(){
+  const s=getStatsCopy();
+  const hp=document.getElementById('hero-pct2');if(hp)hp.innerHTML=s.pct+'<span>%</span>';
+  const pf=document.getElementById('prog2');if(pf)pf.style.width=s.pct+'%';
+  const pl=document.getElementById('pills2');
+  if(pl)pl.innerHTML=`
+    <div class="pill"><span class="pdot" style="background:var(--ink)"></span><strong>${s.total}</strong> tareas activas</div>
+    <div class="pill"><span class="pdot" style="background:#1a6b3a"></span><strong>${s.done}</strong> completadas</div>
+    <div class="pill"><span class="pdot" style="background:var(--cyan)"></span><strong>${s.init}</strong> iniciadas</div>
+    <div class="pill"><span class="pdot" style="background:#8a6800"></span><strong>${s.prog}</strong> en progreso</div>
+    <div class="pill"><span class="pdot" style="background:#8b1a1a"></span><strong>${s.blok}</strong> bloqueadas</div>
+    <div class="pill"><span class="pdot" style="background:#a85a00"></span><strong>${s.dep}</strong> con dependencia</div>
+    <div class="pill"><span class="pdot" style="background:var(--ink-faint)"></span><strong>${s.pend}</strong> sin iniciar</div>
+    ${s.na?`<div class="pill sNa" style="font-size:12px"><strong>${s.na}</strong> no aplica este año</div>`:''}
+  `;
+  const info=document.getElementById('copia-info');
+  if(info) info.textContent='📌 Copia de trabajo · actualizada '+(copiaMeta?copiaMeta.fecha:'—')+' · '+(tasksCopy?tasksCopy.length:0)+' tareas · cambios guardados solo en este navegador hasta que autorices';
+}
+
+function toggleMesCollapseCopia(mes){
+  if(mesesCollapsedCopy.has(mes)) mesesCollapsedCopy.delete(mes);
+  else mesesCollapsedCopy.add(mes);
   renderCopia();
 }
 
 function renderCopia(){
-  const info=document.getElementById('copia-info');
-  if(!tasksCopy||!tasksCopy.length){
-    if(info) info.textContent='Aún no hay copia guardada. Haz clic en "Crear / Actualizar copia" para respaldar las tareas actuales antes de corregir.';
-    const tb=document.getElementById('tbody2');
-    if(tb) tb.innerHTML='<tr><td colspan="7" style="padding:2rem;text-align:center;color:var(--ink-muted)">Sin copia todavía</td></tr>';
-    return;
-  }
-  if(info) info.textContent='📌 Copia guardada el '+(copiaMeta?copiaMeta.fecha:'—')+' · '+tasksCopy.length+' tareas · esta vista es de solo lectura y no afecta a la pestaña Tareas ni al Ejecutivo';
+  if(!tasksCopy){ crearCopiaTareas(true); return; } // primera vez: copia fiel automática
   const fM=document.getElementById('fMes2').value,fE=document.getElementById('fEje2').value,
     fS=document.getElementById('fSt2').value,fQ=document.getElementById('fQ2').value.toLowerCase();
   const filtered=tasksCopy.filter(t=>{
@@ -1445,25 +1502,124 @@ function renderCopia(){
   let h='';
   MES.forEach(m=>{
     if(!g[m])return;
+    const collapsed=mesesCollapsedCopy.has(m);
     const done=g[m].filter(t=>t.status==='Completada').length;
     const pct=g[m].length?Math.round(done/g[m].length*100):0;
-    h+=`<tr class="mhdr-mes" style="user-select:none">
-      <td colspan="7">${m} · ${g[m].length} tarea${g[m].length>1?'s':''} · ${pct}% completado</td></tr>`;
-    g[m].forEach(t=>{
-      const sc=ESHORT[t.eje]||'',stc=scls(t.status);
+    h+=`<tr class="mhdr-mes" onclick="toggleMesCollapseCopia('${m}')" style="cursor:pointer;user-select:none">
+      <td colspan="6">
+        <span style="font-size:13px;margin-right:6px">${collapsed?'▸':'▾'}</span>${m} · ${g[m].length} tarea${g[m].length>1?'s':''} · ${pct}% completado
+      </td></tr>`;
+    if(!collapsed){
+      g[m].forEach(t=>{
+        const sc=ESHORT[t.eje]||'',stc=scls(t.status);
       h+=`<tr>
-        <td style="color:var(--ink-muted);font-size:12px;white-space:nowrap">${t.mes}</td>
+        <td style="color:var(--ink-muted);font-size:12px;white-space:nowrap">
+          ${t.mes}
+          ${(t.reprogramadaDe||t.reprogramada)?`<div style="margin-top:3px;display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;background:#fad83f;color:#5a4a00;padding:2px 6px;border-radius:4px;white-space:nowrap">↩ REPROG.</div>`:''}
+        </td>
         <td><span class="eb e${sc}" title="${t.eje}">${sc}</span></td>
-        <td style="font-size:13px;color:var(--ink);padding:6px 4px">${(t.accion||'').replace(/</g,'&lt;')}</td>
-        <td style="font-size:12px;color:var(--ink-muted);padding:6px 4px">${(t.resp||'').replace(/</g,'&lt;')}</td>
-        <td><span class="ssel ${stc}" style="pointer-events:none;display:inline-block;opacity:.85">${t.status}</span></td>
-        <td style="font-size:12px;padding:6px 4px">${(t.entregable||'').replace(/</g,'&lt;')||'—'}</td>
-        <td style="font-size:12px;padding:6px 4px">${(t.notas||'').replace(/</g,'&lt;')||'—'}</td>
+        <td style="min-width:180px;max-width:280px">
+          <textarea class="ni" style="font-size:13px;color:var(--ink);background:transparent;border-color:transparent;padding:2px 4px;width:100%;line-height:1.4;cursor:text;resize:none;overflow:hidden;min-height:28px"
+            onmouseover="this.style.borderColor='var(--border)'"
+            onmouseout="if(document.activeElement!==this)this.style.borderColor='transparent'"
+            onfocus="this.style.borderColor='var(--blue)';this.style.background='var(--white)'"
+            onblur="this.style.borderColor='transparent';this.style.background='transparent';renderCopia()"
+            oninput="upd2(${t.id},'accion',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+          >${t.accion.replace(/</g,'&lt;')}</textarea>
+        </td>
+        <td style="min-width:110px;max-width:160px">
+          <textarea class="ni" style="font-size:12px;color:var(--ink-muted);background:transparent;border-color:transparent;padding:2px 4px;width:100%;line-height:1.4;cursor:text;resize:none;overflow:hidden;min-height:28px"
+            onmouseover="this.style.borderColor='var(--border)'"
+            onmouseout="if(document.activeElement!==this)this.style.borderColor='transparent'"
+            onfocus="this.style.borderColor='var(--blue)';this.style.background='var(--white)'"
+            onblur="this.style.borderColor='transparent';this.style.background='transparent';renderCopia()"
+            oninput="upd2(${t.id},'resp',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+          >${(t.resp||'').replace(/</g,'&lt;')}</textarea>
+        </td>
+        <td><select class="ssel ${stc}" onchange="upd2(${t.id},'status',this.value);this.className='ssel '+scls(this.value);renderCopia()">
+          <option ${t.status==='Sin iniciar'?'selected':''}>Sin iniciar</option>
+          <option ${t.status==='Iniciada'?'selected':''}>Iniciada</option>
+          <option ${t.status==='En progreso'?'selected':''}>En progreso</option>
+          <option ${t.status==='Completada'?'selected':''}>Completada</option>
+          <option ${t.status==='Bloqueada'?'selected':''}>Bloqueada</option>
+          <option ${t.status==='Con dependencia'?'selected':''}>Con dependencia</option>
+          <option ${t.status==='Reprogramada'?'selected':''}>Reprogramada</option>
+          <option ${t.status==='No aplica este año'?'selected':''}>No aplica este año</option>
+        </select></td>
+        <td>${t.status==='Reprogramada'?'<select class="fs" style="font-size:11px;padding:3px 6px;width:100%" onchange="upd2('+t.id+',\'nuevoMes\',this.value)">'+MES.map(m=>'<option '+(t.nuevoMes===m?'selected':'')+'>'+m+'</option>').join('')+'</select>':'<span style="font-size:12px;color:var(--ink-faint)">—</span>'}</td>
+        <td style="min-width:160px"><textarea class="ni" placeholder="Opcional..." oninput="upd2(${t.id},'entregable',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" onblur="renderCopia()" style="width:100%;resize:none;overflow:hidden;min-height:28px;line-height:1.4">${(t.entregable||'').replace(/</g,'&lt;')}</textarea></td>
+        <td style="min-width:160px"><textarea class="ni" placeholder="${t.status==='Con dependencia'?'¿De qué área, proyecto o persona depende?':'Agregar nota...'}" oninput="upd2(${t.id},'notas',this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" onblur="renderCopia()" style="width:100%;resize:none;overflow:hidden;min-height:28px;line-height:1.4${t.status==='Con dependencia'&&!t.notas?';border-color:#f0b878;background:#fef8f0':''}">${(t.notas||'').replace(/</g,'&lt;')}</textarea></td>
+        <td><button onclick="delTareaCopia(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--ink-faint);font-size:15px;padding:2px 4px;border-radius:4px" title="Eliminar">×</button></td>
       </tr>`;
-    });
+      });
+    }
   });
-  const tb=document.getElementById('tbody2');
-  if(tb) tb.innerHTML=h||'<tr><td colspan="7" style="padding:2rem;text-align:center;color:var(--ink-muted)">Sin resultados</td></tr>';
+  document.getElementById('tbody2').innerHTML=h||'<tr><td colspan="9" style="padding:2rem;text-align:center;color:var(--ink-muted)">Sin resultados</td></tr>';
+  document.querySelectorAll('#tbody2 textarea').forEach(t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px';});
+  renderMetaCopia();
+}
+
+function upd2(id,field,val){
+  const t=tasksCopy.find(x=>x.id===id);
+  if(t){
+    t[field]=val;
+    if(field==='nuevoMes' && val && t.status==='Reprogramada'){
+      const yaExiste=tasksCopy.some(x=>x.reprogramadaDe===id&&x.mes===val);
+      if(!yaExiste){
+        const copia={
+          id: Date.now(),
+          mes: val,
+          eje: t.eje,
+          accion: t.accion,
+          resp: t.resp,
+          status: 'Sin iniciar',
+          notas: (t.notas?t.notas+' · ':'')+'Reprogramada desde '+t.mes,
+          entregable: t.entregable||'',
+          nuevoMes: '',
+          reprogramadaDe: t.id,
+          reprogramada: true
+        };
+        tasksCopy.push(copia);
+      }
+    }
+    dsaveCopia();
+    renderMetaCopia();
+    const active=document.activeElement;
+    const isTyping=active&&(active.tagName==='TEXTAREA'||active.tagName==='INPUT')&&active.type!=='date'&&active.type!=='number';
+    if(!isTyping) renderCopia();
+  }
+}
+
+function addTareaCopia(){
+  const newId=Date.now();
+  const mes=document.getElementById('fMes2').value||'Agosto';
+  tasksCopy.push({id:newId,mes,eje:'Procesos y Estructura RH',accion:'Nueva tarea',resp:'Paloma',status:'Sin iniciar',notas:'',entregable:'',nuevoMes:''});
+  dsaveCopia();renderMetaCopia();renderCopia();
+  setTimeout(()=>{
+    const rows=document.querySelectorAll('#tbody2 tr');
+    if(rows.length) rows[rows.length-1].scrollIntoView({behavior:'smooth',block:'center'});
+  },100);
+}
+
+function delTareaCopia(id){
+  if(!confirm('¿Eliminar esta tarea de la copia?'))return;
+  tasksCopy=tasksCopy.filter(x=>x.id!==id);
+  dsaveCopia();renderMetaCopia();renderCopia();
+}
+
+// Aplica la copia como versión oficial: reemplaza "tasks", guarda y sincroniza a Sheets
+function promoverCopiaAFinal(){
+  if(!tasksCopy){ alert('Todavía no hay copia que promover.'); return; }
+  if(!confirm('Esto va a REEMPLAZAR la pestaña "Tareas" oficial con lo que hay en "Tareas (Copia)" y lo va a sincronizar a Google Sheets.\n\nAntes de aplicar, se guardará un respaldo local de cómo estaba la versión oficial por si necesitas recuperarla.\n\n¿Confirmas que ya está autorizado y quieres continuar?')) return;
+  // Respaldo de seguridad de lo que había antes de sobrescribir
+  localStorage.setItem('hostech_rh2026_v1_pre_promocion',JSON.stringify(tasks));
+  localStorage.setItem('hostech_rh2026_v1_pre_promocion_fecha',new Date().toLocaleString('es-MX'));
+  tasks=JSON.parse(JSON.stringify(tasksCopy));
+  saveData(); // guarda en localStorage KEY y sincroniza 'tareas' a Sheets
+  render();
+  renderMeta();
+  if(typeof renderEjecutivo==='function') renderEjecutivo();
+  alert('Listo ✓ La copia ahora es la versión oficial de Tareas y ya se sincronizó a Sheets.');
 }
 
 // Helper global: % ponderado (Completada=1, Iniciada=0.5, No aplica excluida)
@@ -1560,7 +1716,13 @@ function showTab(tab,btn){
     mesesCollapsed=new Set(MES.filter(m=>m!==mesActualNombre));
     render();
   }
-  if(tab==='tareasCopia')renderCopia();
+  if(tab==='tareasCopia'){
+    if(tasksCopy){
+      const mesActualNombre=MES[new Date().getMonth()];
+      mesesCollapsedCopy=new Set(MES.filter(m=>m!==mesActualNombre));
+    }
+    renderCopia();
+  }
   if(tab==='kpis')renderKPIs();
   if(tab==='vacantes'){renderVacantes();renderVacMetrics();}
   if(tab==='bajas'){renderBajas();renderBajasTipoMes();renderRotMes();renderVacMetrics();}
