@@ -449,7 +449,7 @@ tr:hover td{background:var(--white)}
         <option>Sin iniciar</option><option>Bloqueada</option><option>Con dependencia</option><option>No aplica este año</option><option>Reprogramada</option>
       </select>
       <input class="fs" id="fQ" placeholder="Buscar tarea o responsable..." oninput="render()">
-      <button onclick="addTarea()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">+ Nueva tarea</button>
+      <button onclick="abrirModalMes(addTarea, document.getElementById('fMes').value)" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">+ Nueva tarea</button>
       <button onclick="mesesCollapsed=new Set();render()" title="Expandir todos los meses" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--ink-faint);color:var(--white);border:none;cursor:pointer" onmouseover="this.style.background='#888'" onmouseout="this.style.background='var(--ink-faint)'">▾ Todo</button>
       <button onclick="mesesCollapsed=new Set(MES);render()" title="Colapsar todos los meses" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--ink-faint);color:var(--white);border:none;cursor:pointer" onmouseover="this.style.background='#888'" onmouseout="this.style.background='var(--ink-faint)'">▸ Todo</button>
     </div>
@@ -513,7 +513,7 @@ tr:hover td{background:var(--white)}
         <option>Sin iniciar</option><option>Bloqueada</option><option>Con dependencia</option><option>No aplica este año</option><option>Reprogramada</option>
       </select>
       <input class="fs" id="fQ2" placeholder="Buscar tarea o responsable..." oninput="renderCopia()">
-      <button onclick="addTareaCopia()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">+ Nueva tarea</button>
+      <button onclick="abrirModalMes(addTareaCopia, document.getElementById('fMes2').value)" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">+ Nueva tarea</button>
       <button onclick="mesesCollapsedCopy=new Set();renderCopia()" title="Expandir todos los meses" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--ink-faint);color:var(--white);border:none;cursor:pointer" onmouseover="this.style.background='#888'" onmouseout="this.style.background='var(--ink-faint)'">▾ Todo</button>
       <button onclick="mesesCollapsedCopy=new Set(MES);renderCopia()" title="Colapsar todos los meses" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;background:var(--ink-faint);color:var(--white);border:none;cursor:pointer" onmouseover="this.style.background='#888'" onmouseout="this.style.background='var(--ink-faint)'">▸ Todo</button>
     </div>
@@ -1122,6 +1122,23 @@ tr:hover td{background:var(--white)}
     </div>
   <!-- ── JUNTA SEMANAL ── -->
 
+  <!-- ── MODAL: elegir mes al crear tarea ── -->
+  <div id="mesModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(16,16,15,.45);z-index:9999;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:14px;padding:1.5rem;width:280px;max-width:90vw;font-family:'DM Sans',sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.25)">
+      <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink);margin-bottom:4px">Nueva tarea</div>
+      <div style="font-size:13px;color:var(--ink-muted);margin-bottom:14px">¿En qué mes quieres agregarla?</div>
+      <select id="mesModalSelect" class="fs" style="width:100%;margin-bottom:18px">
+        <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+        <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+        <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+      </select>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onclick="cerrarModalMes()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 14px;border-radius:8px;background:var(--ink-faint);color:#fff;border:none;cursor:pointer">Cancelar</button>
+        <button onclick="confirmarModalMes()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 14px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;font-weight:500">Agregar</button>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -1403,10 +1420,33 @@ function upd(id,field,val){
   }
 }
 
-function addTarea(){
+// ── MODAL: elegir mes antes de crear una tarea ──
+let mesModalCallback=null;
+function abrirModalMes(callback, mesSugerido){
+  const sel=document.getElementById('mesModalSelect');
+  if(sel) sel.value=mesSugerido||MES[new Date().getMonth()];
+  mesModalCallback=callback;
+  const ov=document.getElementById('mesModalOverlay');
+  if(ov) ov.style.display='flex';
+}
+function cerrarModalMes(){
+  const ov=document.getElementById('mesModalOverlay');
+  if(ov) ov.style.display='none';
+  mesModalCallback=null;
+}
+function confirmarModalMes(){
+  const sel=document.getElementById('mesModalSelect');
+  const mes=sel?sel.value:null;
+  const cb=mesModalCallback;
+  cerrarModalMes();
+  if(cb&&mes) cb(mes);
+}
+
+function addTarea(mesElegido){
   const newId=Date.now();
-  const mes=document.getElementById('fMes').value||'Mayo';
+  const mes=mesElegido||document.getElementById('fMes').value||MES[new Date().getMonth()];
   tasks.push({id:newId,mes,eje:'Procesos y Estructura RH',accion:'Nueva tarea',resp:'Paloma',status:'Sin iniciar',notas:'',entregable:'',nuevoMes:''});
+  mesesCollapsed.delete(mes); // asegura que el mes quede visible
   dsave();renderMeta();render();
   // scroll a la nueva tarea
   setTimeout(()=>{
@@ -1590,10 +1630,11 @@ function upd2(id,field,val){
   }
 }
 
-function addTareaCopia(){
+function addTareaCopia(mesElegido){
   const newId=Date.now();
-  const mes=document.getElementById('fMes2').value||'Agosto';
+  const mes=mesElegido||document.getElementById('fMes2').value||MES[new Date().getMonth()];
   tasksCopy.push({id:newId,mes,eje:'Procesos y Estructura RH',accion:'Nueva tarea',resp:'Paloma',status:'Sin iniciar',notas:'',entregable:'',nuevoMes:''});
+  mesesCollapsedCopy.delete(mes); // asegura que el mes quede visible
   dsaveCopia();renderMetaCopia();renderCopia();
   setTimeout(()=>{
     const rows=document.querySelectorAll('#tbody2 tr');
