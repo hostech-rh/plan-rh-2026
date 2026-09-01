@@ -403,6 +403,7 @@ tr:hover td{background:var(--white)}
   <div class="nav-in">
     <button class="ntab active" onclick="showTab('ejecutivo',this)">Ejecutivo</button>
     <button class="ntab" onclick="showTab('tareas',this)">Tareas</button>
+    <button class="ntab" onclick="showTab('tareasCopia',this)">Tareas (Copia)</button>
     <button class="ntab" onclick="showTab('vacantes',this)">Vacantes</button>
     <button class="ntab" onclick="showTab('bajas',this)">Bajas</button>
     <button class="ntab" onclick="showTab('hellena',this)">Hellena</button>
@@ -470,6 +471,56 @@ tr:hover td{background:var(--white)}
     </div>
   </div>
 
+  </div>
+
+  <!-- ── TAREAS (COPIA / RESPALDO) ── -->
+  <div id="tab-tareasCopia" style="display:none">
+    <div class="hero">
+      <div>
+        <h2>Copia de <em>respaldo</em></h2>
+        <p>Instantánea de solo lectura de la pestaña Tareas · úsala para comparar mientras corriges</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button onclick="crearCopiaTareas()" style="font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 16px;border-radius:8px;background:#4563ff;color:#fff;border:none;cursor:pointer;white-space:nowrap;font-weight:500">🔄 Crear / Actualizar copia</button>
+      </div>
+    </div>
+    <div id="copia-info" style="font-size:12.5px;color:var(--ink-muted);margin:-0.5rem 0 1rem 0;padding:0 .25rem"></div>
+    <div class="filters">
+      <select class="fs" id="fMes2" onchange="renderCopia()">
+        <option value="">Todos los meses</option>
+        <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+        <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+        <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+      </select>
+      <select class="fs" id="fEje2" onchange="renderCopia()">
+        <option value="">Todos los ejes</option>
+        <option>Atracción y Retención de Talento</option>
+        <option>Capacitación</option>
+        <option>Desarrollo y Formación</option>
+        <option>Cultura y Comunicación interna</option>
+        <option>Procesos y Estructura RH</option>
+      </select>
+      <select class="fs" id="fSt2" onchange="renderCopia()">
+        <option value="">Todos los estados</option>
+        <option>Completada</option><option>Iniciada</option><option>En progreso</option>
+        <option>Sin iniciar</option><option>Bloqueada</option><option>Con dependencia</option><option>No aplica este año</option><option>Reprogramada</option>
+      </select>
+      <input class="fs" id="fQ2" placeholder="Buscar tarea o responsable..." oninput="renderCopia()">
+    </div>
+    <div class="twrap">
+      <table>
+        <thead><tr>
+          <th style="width:66px">Mes</th>
+          <th style="width:50px">Eje</th>
+          <th style="min-width:200px">Acción</th>
+          <th style="width:110px">Responsable</th>
+          <th style="width:118px">Estado</th>
+          <th style="min-width:160px">Entregable obtenido</th>
+          <th style="min-width:160px">Notas</th>
+        </tr></thead>
+        <tbody id="tbody2"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- ── KPIs ── -->
@@ -1358,6 +1409,63 @@ function delTarea(id){
   dsave();renderMeta();render();
 }
 
+// ── COPIA DE RESPALDO DE TAREAS (solo lectura, solo local, NO se sincroniza a Sheets) ──
+const COPIA_KEY='hostech_rh2026_v1_tareas_copia';
+const COPIA_META_KEY='hostech_rh2026_v1_tareas_copia_meta';
+let tasksCopy=JSON.parse(localStorage.getItem(COPIA_KEY)||'null');
+let copiaMeta=JSON.parse(localStorage.getItem(COPIA_META_KEY)||'null');
+
+function crearCopiaTareas(){
+  if(tasksCopy && !confirm('Ya existe una copia guardada del '+(copiaMeta?copiaMeta.fecha:'')+'.\n¿Quieres sobrescribirla con los datos ACTUALES de la pestaña Tareas?')) return;
+  tasksCopy=JSON.parse(JSON.stringify(tasks)); // copia profunda, independiente de "tasks"
+  copiaMeta={fecha:new Date().toLocaleString('es-MX')};
+  localStorage.setItem(COPIA_KEY,JSON.stringify(tasksCopy));
+  localStorage.setItem(COPIA_META_KEY,JSON.stringify(copiaMeta));
+  renderCopia();
+}
+
+function renderCopia(){
+  const info=document.getElementById('copia-info');
+  if(!tasksCopy||!tasksCopy.length){
+    if(info) info.textContent='Aún no hay copia guardada. Haz clic en "Crear / Actualizar copia" para respaldar las tareas actuales antes de corregir.';
+    const tb=document.getElementById('tbody2');
+    if(tb) tb.innerHTML='<tr><td colspan="7" style="padding:2rem;text-align:center;color:var(--ink-muted)">Sin copia todavía</td></tr>';
+    return;
+  }
+  if(info) info.textContent='📌 Copia guardada el '+(copiaMeta?copiaMeta.fecha:'—')+' · '+tasksCopy.length+' tareas · esta vista es de solo lectura y no afecta a la pestaña Tareas ni al Ejecutivo';
+  const fM=document.getElementById('fMes2').value,fE=document.getElementById('fEje2').value,
+    fS=document.getElementById('fSt2').value,fQ=document.getElementById('fQ2').value.toLowerCase();
+  const filtered=tasksCopy.filter(t=>{
+    if(fM&&t.mes!==fM)return false;if(fE&&t.eje!==fE)return false;
+    if(fS&&t.status!==fS)return false;
+    if(fQ&&!t.accion.toLowerCase().includes(fQ)&&!(t.resp||'').toLowerCase().includes(fQ))return false;
+    return true;
+  });
+  const g={};filtered.forEach(t=>{if(!g[t.mes])g[t.mes]=[];g[t.mes].push(t);});
+  let h='';
+  MES.forEach(m=>{
+    if(!g[m])return;
+    const done=g[m].filter(t=>t.status==='Completada').length;
+    const pct=g[m].length?Math.round(done/g[m].length*100):0;
+    h+=`<tr class="mhdr-mes" style="user-select:none">
+      <td colspan="7">${m} · ${g[m].length} tarea${g[m].length>1?'s':''} · ${pct}% completado</td></tr>`;
+    g[m].forEach(t=>{
+      const sc=ESHORT[t.eje]||'',stc=scls(t.status);
+      h+=`<tr>
+        <td style="color:var(--ink-muted);font-size:12px;white-space:nowrap">${t.mes}</td>
+        <td><span class="eb e${sc}" title="${t.eje}">${sc}</span></td>
+        <td style="font-size:13px;color:var(--ink);padding:6px 4px">${(t.accion||'').replace(/</g,'&lt;')}</td>
+        <td style="font-size:12px;color:var(--ink-muted);padding:6px 4px">${(t.resp||'').replace(/</g,'&lt;')}</td>
+        <td><span class="ssel ${stc}" style="pointer-events:none;display:inline-block;opacity:.85">${t.status}</span></td>
+        <td style="font-size:12px;padding:6px 4px">${(t.entregable||'').replace(/</g,'&lt;')||'—'}</td>
+        <td style="font-size:12px;padding:6px 4px">${(t.notas||'').replace(/</g,'&lt;')||'—'}</td>
+      </tr>`;
+    });
+  });
+  const tb=document.getElementById('tbody2');
+  if(tb) tb.innerHTML=h||'<tr><td colspan="7" style="padding:2rem;text-align:center;color:var(--ink-muted)">Sin resultados</td></tr>';
+}
+
 // Helper global: % ponderado (Completada=1, Iniciada=0.5, No aplica excluida)
 function pctW(list){
   const active=list.filter(t=>t.status!=='No aplica este año'&&t.status!=='Reprogramada');
@@ -1438,6 +1546,7 @@ function renderDash(){
 function showTab(tab,btn){
   document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   document.getElementById('tab-tareas').style.display=tab==='tareas'?'':'none';
+  document.getElementById('tab-tareasCopia').style.display=tab==='tareasCopia'?'':'none';
   document.getElementById('tab-kpis').style.display=tab==='kpis'?'':'none';
   document.getElementById('tab-vacantes').style.display=tab==='vacantes'?'':'none';
   document.getElementById('tab-bajas').style.display=tab==='bajas'?'':'none';
@@ -1451,6 +1560,7 @@ function showTab(tab,btn){
     mesesCollapsed=new Set(MES.filter(m=>m!==mesActualNombre));
     render();
   }
+  if(tab==='tareasCopia')renderCopia();
   if(tab==='kpis')renderKPIs();
   if(tab==='vacantes'){renderVacantes();renderVacMetrics();}
   if(tab==='bajas'){renderBajas();renderBajasTipoMes();renderRotMes();renderVacMetrics();}
